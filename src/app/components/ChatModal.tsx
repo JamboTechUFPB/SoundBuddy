@@ -1,6 +1,8 @@
-import { useState, useEffect, useRef } from 'react'; // Importando hooks necessários do React
+import { useState, useEffect, useRef } from 'react'; 
 import { PaperAirplaneIcon, XMarkIcon, EllipsisHorizontalIcon, PhotoIcon } from '@heroicons/react/24/outline'; // Importando ícones de outline
-import { CheckIcon } from '@heroicons/react/24/solid'; // Importando ícone sólido para check de leitura
+import { CheckIcon } from '@heroicons/react/24/solid'; 
+
+//TODO: TEXTO DA MENSAGEM TEM QUE TER QUEBRA DE LINHA E NÃO QUEBRAR O COMPONENTE
 
 /**
  * Componente ChatModal - Modal de chat para comunicação em tempo real
