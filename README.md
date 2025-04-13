@@ -17,7 +17,7 @@ Para garantir consistência no desenvolvimento:
    git checkout -b <id-descricao-simples-da-task>
    ```  
    - **ID:** Número da task ou issue.  
-   - Exemplo: `7-implementacao-mapa-paraiba`  
+   - Exemplo: `7-adicionar-sistema-notificacoes`  
 
 3. **Finalize a tarefa:**  
    Após testes e revisões, abra um **Merge Request (MR)** para a branch `dev`.  
@@ -33,7 +33,7 @@ git commit -m "tipo: descrição"
 ```  
 **Exemplo:**  
 ```bash
-feat: adiciona integração com banco de dados PostGIS
+feat: adiciona integração com banco de dados PostgreSQL
 ```  
 
 ---
