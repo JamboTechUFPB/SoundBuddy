@@ -1,0 +1,19 @@
+.scrollbar-left {
+    direction: rtl;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  
+  .scrollbar-left > * {
+    direction: ltr;
+  }
+  
+  .scrollbar-left::-webkit-scrollbar {
+    width: 6px;
+    left: 0;
+  }
+  
+  .scrollbar-left::-webkit-scrollbar-thumb {
+    background: #404040;
+    border-radius: 3px;
+  }

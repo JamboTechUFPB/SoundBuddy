@@ -1,58 +1,36 @@
-# 🎶 SoundBuddy
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-A indústria musical é movida por conexões e oportunidades, mas o processo de encontrar músicos e contratantes ainda é fragmentado, exigindo buscas extensas e negociações descentralizadas. O **SoundBuddy** surge como uma solução para essa necessidade, funcionando como um **"LinkedIn musical"** que conecta músicos, produtores e contratantes em um ambiente digital dinâmico e interativo.
+## Getting Started
 
-## 🔄 Fluxo de Trabalho  
+First, run the development server:
 
-Para garantir consistência no desenvolvimento:  
-
-1. **Atualize a branch de desenvolvimento local:**  
-   ```bash
-   git checkout dev
-   git pull origin dev
-   ```  
-
-2. **Crie uma nova branch:**  
-   ```bash
-   git checkout -b <id-descricao-simples-da-task>
-   ```  
-   - **ID:** Número da task ou issue.  
-   - Exemplo: `7-adicionar-sistema-notificacoes`  
-
-3. **Finalize a tarefa:**  
-   Após testes e revisões, abra um **Merge Request (MR)** para a branch `dev`.  
-   **⚠️ Não envie diretamente para a branch principal (`main`).**  
-
----
-
-## 📝 Padrão de Commits  
-
-As mensagens de commit devem ser claras, seguindo o padrão:  
 ```bash
-git commit -m "tipo: descrição"
-```  
-**Exemplo:**  
-```bash
-feat: adiciona integração com banco de dados PostgreSQL
-```  
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
----
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-### 📂 Tipos de Commits  
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-| Tipo      | Descrição                                                                                   |
-|-----------|---------------------------------------------------------------------------------------------|
-| `feat`    | Adição de uma nova funcionalidade.                                                          |
-| `fix`     | Correção de bugs.                                                                          |
-| `docs`    | Alterações na documentação (ex.: README).                                                  |
-| `test`    | Alterações ou criação de testes unitários.                                                 |
-| `build`   | Modificações em arquivos de build e dependências.                                          |
-| `style`   | Alterações de formatação, linting ou estilo (sem mudanças na lógica de código).            |
-| `refactor`| Refatorações sem alteração de funcionalidade.                                              |
-| `chore`   | Atualizações administrativas ou configurações (ex.: `.gitignore`, pacotes, etc.).          |  
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
----
+## Learn More
 
-💻 **Siga este padrão para manter a consistência e colaboração eficaz no projeto!**
+To learn more about Next.js, take a look at the following resources:
 
----  
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
