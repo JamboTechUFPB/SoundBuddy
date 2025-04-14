@@ -5,8 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --watch src --exec node src/index.js",
-    "start": "node src/index.js"
+    "dev": "nodemon --watch src --exec node index.js",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
