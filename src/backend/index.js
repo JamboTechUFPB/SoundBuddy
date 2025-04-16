@@ -1,7 +1,11 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-import userRoutes from './routes/userRoutes.js';  
+import userRoutes from './routes/userRoutes.js';
+import { userRoutesDefinitions } from './routes/userRoutes.js';
+import swaggerUi from 'swagger-ui-express';
+import swaggerJsDoc from 'swagger-jsdoc';
+
 
 dotenv.config();
 
@@ -26,8 +30,14 @@ app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerJsDoc({
+  definition: userRoutesDefinitions,
+  apis: ['./src/backend/routes/*.js'],
+})));
+
 app.use('/api', userRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
+  console.log(`API documentation available at http://localhost:${port}/api-docs`);
 });
