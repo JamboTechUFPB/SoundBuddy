@@ -23,16 +23,38 @@ export default function Login() {
    * Lida com o envio do formulário de login
    * @param {Event} e - Evento de formulário
    */
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
+    console.log('Login submitted:', { email, password });
     
-    
-    // TODO: Implementar autenticação real com API/backend
-    // TODO: Adicionar tratamento de erros de autenticação
-    // TODO: Implementar armazenamento de token de sessão
-    
-    // Navega para a página inicial após "login" bem-sucedido
-    router.push('/Home');
+    try {
+      const response = await fetch('http://localhost:8000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ email, password }),
+      });
+  
+      if (!response.ok) {
+        alert('Email ou senha inválidos');
+        return;
+      }
+  
+      const data = await response.json();
+      
+      // Salva tokens
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
+  
+      // Redireciona
+      router.push('/Home');
+  
+    } catch (error) {
+      alert('Erro ao fazer login');
+      console.error(error);
+    }
   };
   
   /**
