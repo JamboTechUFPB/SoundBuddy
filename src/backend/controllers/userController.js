@@ -14,6 +14,10 @@ export const userController = {
       const name = req.body.name;
       const email = req.body.email || null;
       const password = req.body.password || null;
+      
+      const userType = req.body.userType || null;
+      const tags = req.body.tags || [];
+
       if (!email) {
         return res.status(400).json({ message: 'Email is required' });
       }
@@ -32,14 +36,15 @@ export const userController = {
       let user;
       const hashedPassword = await bcrypt.hash(password, 10);
       
-      user = new userModel({ name, email, password: hashedPassword });
+      user = new userModel({ name, email, password: hashedPassword, tags, userType });
       await user.save();
 
       const accessToken = generateAccessToken(user);
       const refreshToken = await generateRefreshToken(user);
 
-      res.status(201).json({ user: user.toJSON(), accessToken, refreshToken });
+      res.status(201).json({ user, accessToken, refreshToken });
     } catch (error) {
+      console.error("Error creating user: ", error);
       res.status(500).json({ message: error.message });
     }
   },
