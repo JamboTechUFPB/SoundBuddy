@@ -73,20 +73,69 @@ export const userController = {
   },
 
   async refreshToken(req, res) {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Get the token after "Bearer"
-    if (!token) return res.sendStatus(401); // Unauthorized if no token is present
+    try {
+      // Busca token primeiro no header, depois nos cookies
+      const tokenFromHeader = req.headers['authorization']?.split(' ')[1];
+      const tokenFromCookie = req.cookies?.refreshToken;
+      const refreshToken = tokenFromHeader || tokenFromCookie;
 
-    const user = await userModel.findOne({ refreshToken: token });
-    if (!user) return res.sendStatus(403); // Forbidden if token is not associated with a user
+      if (!refreshToken) {
+          return res.status(401).json({
+              message: 'Refresh token não fornecido'
+          });
+      }
 
-    jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, async (err, userData) => {
-        if (err) return res.sendStatus(403); // Forbidden if token is invalid
+      // Verifica validade do token
+      const userData = await new Promise((resolve, reject) => {
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+            if (err) reject(err);
+            resolve(decoded);
+        });
+      });
 
-        const accessToken = generateAccessToken(userData);
-        const refreshToken = await generateRefreshToken(userData);
-        res.json({ accessToken, refreshToken });
-    });
+      // Busca usuário com o token
+      const user = await userModel.findOne({ refreshToken });
+      if (!user) {
+          return res.status(403).json({
+              message: 'Token não associado a nenhum usuário'
+          });
+      }
+
+      if (userData.id !== user._id.toString()) {
+          return res.status(403).json({
+              message: 'Token não associado a este usuário'
+          });
+      }
+
+      // Gera novos tokens
+      const accessToken = generateAccessToken(user);
+      const newRefreshToken = await generateRefreshToken(user);
+      
+      user.refreshToken = newRefreshToken;
+      await user.save();
+
+      return res.json({
+          accessToken,
+          refreshToken: newRefreshToken
+      });
+
+    } catch (error) {
+      if (error instanceof jwt.TokenExpiredError) {
+          return res.status(401).json({
+              message: 'Refresh token expirado'
+          });
+      }
+
+      if (error instanceof jwt.JsonWebTokenError) {
+          return res.status(403).json({
+              message: 'Refresh token inválido'
+          });
+      }
+
+      return res.status(500).json({
+          message: 'Erro interno do servidor'
+      });
+    }
   },
 
   async logoutUser(req, res) {
@@ -126,5 +175,19 @@ export const userController = {
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
-  }
+  },
+  async getUserInfo(req, res){
+    try {
+      // get logged user info
+      const userId = req.user.id? req.user.id : req.user._id;
+      const user = await userModel.find( { _id: userId } );
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      res.status(200).json(user);
+
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
 }
