@@ -5,7 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --watch src --exec node index.js",
+    "dev": "bash run_mongo.sh && nodemon --watch src --exec node index.js",
     "start": "node index.js"
   },
   "repository": {
@@ -22,7 +22,10 @@
     "nodemon": "^3.1.9"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.5.0",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.13.2"
   }
 }
