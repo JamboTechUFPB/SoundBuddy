@@ -7,51 +7,57 @@ set -a
 source <(grep -E '^[A-Z_][A-Z0-9_]*=.*$' .env)
 set +a
 
-# Verificar se o contêiner 'mongo-soundbuddy' existe
-if [ "$(docker ps -a -q --filter name=^/mongo-soundbuddy$)" ]; then
-  echo "Contêiner 'mongo-soundbuddy' já existe. Tentando iniciar..."
+# Verificar se as variáveis de ambiente necessárias estão definidas
+if [ -z "$DB_NAME" ] || [ -z "$DB_PORT" ]; then
+    echo "Erro: DB_NAME ou DB_PORT não estão definidos no arquivo .env"
+    exit 1
+fi
 
-  # Tentar iniciar o contêiner Docker 'mongo-soundbuddy' normalmente
-  docker start mongo-soundbuddy
+# Verificar se o contêiner 'mongo-${DB_NAME}' existe
+if [ "$(docker ps -a -q --filter name=^/mongo-${DB_NAME}$)" ]; then
+  echo "Contêiner 'mongo-${DB_NAME}' já existe. Tentando iniciar..."
+
+  # Tentar iniciar o contêiner Docker 'mongo-${DB_NAME}' normalmente
+  docker start mongo-${DB_NAME}
 
   # Verificar se o comando foi bem-sucedido
   if [ $? -eq 0 ]; then
-    echo "Contêiner 'mongo-soundbuddy' iniciado com sucesso."
+    echo "Contêiner 'mongo-${DB_NAME}' iniciado com sucesso."
   else
-    echo "Falha ao iniciar o contêiner 'mongo-soundbuddy' normalmente. Tentando com sudo..."
-    # Tentar iniciar o contêiner Docker 'mongo-soundbuddy' usando sudo
-    sudo docker start mongo-soundbuddy
+    echo "Falha ao iniciar o contêiner 'mongo-${DB_NAME}' normalmente. Tentando com sudo..."
+    # Tentar iniciar o contêiner Docker 'mongo-${DB_NAME}' usando sudo
+    sudo docker start mongo-${DB_NAME}
     if [ $? -eq 0 ]; then
-      echo "Contêiner 'mongo-soundbuddy' iniciado com sucesso usando sudo."
+      echo "Contêiner 'mongo-${DB_NAME}' iniciado com sucesso usando sudo."
     else
-      echo "Falha ao iniciar o contêiner 'mongo-soundbuddy' usando sudo."
+      echo "Falha ao iniciar o contêiner 'mongo-${DB_NAME}' usando sudo."
     fi
   fi
 else
-  echo "Contêiner 'mongo-soundbuddy' não existe. Criando e iniciando..."
+  echo "Contêiner 'mongo-${DB_NAME}' não existe. Criando e iniciando..."
 
   # Executar o contêiner MongoDB
   docker run -d \
-    --name mongo-soundbuddy \
-    -p 27020:27017 \
+    --name mongo-${DB_NAME} \
+    -p ${DB_PORT}:27017 \
     -v $(pwd)/mongo-data:/data/db \
     mongo \
     mongod --logpath /dev/null --logappend --quiet
 
   # Verificar se o contêiner foi iniciado com sucesso
   if [ $? -eq 0 ]; then
-    echo "Contêiner MongoDB iniciado com sucesso na porta 27020."
+    echo "Contêiner MongoDB iniciado com sucesso na porta ${DB_PORT}."
   else
     echo "Falha ao iniciar o contêiner MongoDB."
     # Executar o contêiner MongoDB usando sudo
     sudo docker run -d \
-      --name mongo-soundbuddy \
-      -p 27020:27017 \
+      --name mongo-${DB_NAME} \
+      -p ${DB_PORT}:27017 \
       -v $(pwd)/mongo-data:/data/db \
       mongo \
       mongod --logpath /dev/null --logappend --quiet
     if [ $? -eq 0 ]; then
-      echo "Contêiner MongoDB iniciado com sucesso na porta 27020 usando sudo."
+      echo "Contêiner MongoDB iniciado com sucesso na porta ${DB_PORT} usando sudo."
     else
       echo "Falha ao iniciar o contêiner MongoDB usando sudo."
     fi
