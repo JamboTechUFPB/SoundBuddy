@@ -5,11 +5,21 @@ import userRoutes from './routes/userRoutes.js';
 import { userRoutesDefinitions } from './routes/userRoutes.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsDoc from 'swagger-jsdoc';
-
+import cors from 'cors';
 
 dotenv.config();
 
 const app = express();
+
+app.use(cors({
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  maxAge: 86400 // cache preflight por 24 horas
+}));
+
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 const port = process.env.PORT || 8000;
