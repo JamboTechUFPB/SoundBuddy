@@ -1,15 +1,26 @@
-/**
- * Componente principal do perfil de usuário
- * Exibe informações do perfil, botões de interação e publicações do usuário
- * 
- * @param {Object} userData - Dados do usuário a ser exibido
- * @param {boolean} isOwnProfile - Indica se é o perfil do usuário logado
- */
+import { useState } from 'react';
+import SeguidoresModal from '@/app/components/SeguidoresModal';
+
 const ProfileMain = ({ userData, isOwnProfile }) => {
+  // Estado para controlar a exibição do modal
+  const [showModal, setShowModal] = useState(false);
+  // Estado para definir o tipo de lista a ser exibida no modal (seguidores ou seguindo)
+  const [modalType, setModalType] = useState('');
   
   if (!userData) {
     return <div className="p-4 text-center">Carregando perfil...</div>;
   }
+
+  // Função para abrir o modal com o tipo especificado
+  const openModal = (type) => {
+    setModalType(type);
+    setShowModal(true);
+  };
+
+  // Função para fechar o modal
+  const closeModal = () => {
+    setShowModal(false);
+  };
 
   // TODO: Implementar função de edição de perfil quando botão for clicado
   // TODO: Implementar função de seguir/deixar de seguir quando botão for clicado
@@ -21,13 +32,11 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
         <div className="flex flex-col lg:flex-row items-center gap-6">
           {/* Foto de Perfil */}
           <div className="relative">
-   
             <img
               src={userData.image}
               alt="Foto de perfil"
               className="w-32 h-32 rounded-full border-4 border-blue-500 object-cover"
             />
-
           </div>
 
           {/* Informações do Usuário */}
@@ -37,13 +46,19 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
                 <h1 className="text-3xl font-bold mb-2">@{userData.username}</h1>
                 
                 <div className="flex justify-center lg:justify-start gap-8">
-                  {/* TODO: Adicionar modal para mostrar lista de seguidores quando clicado */}
-                  <div className="text-center">
+                  {/* Modal de seguidores será aberto ao clicar */}
+                  <div 
+                    className="text-center cursor-pointer hover:opacity-80"
+                    onClick={() => openModal('seguidores')}
+                  >
                     <span className="block text-xl font-bold">{userData.followers}</span>
                     <span className="text-gray-400">Seguidores</span>
                   </div>
-                  {/* TODO: Adicionar modal para mostrar lista de seguindo quando clicado */}
-                  <div className="text-center">
+                  {/* Modal de seguindo será aberto ao clicar */}
+                  <div 
+                    className="text-center cursor-pointer hover:opacity-80"
+                    onClick={() => openModal('seguindo')}
+                  >
                     <span className="block text-xl font-bold">{userData.following}</span>
                     <span className="text-gray-400">Seguindo</span>
                   </div>
@@ -64,7 +79,6 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
                     {userData.isFollowing ? 'Deixar de seguir' : 'Seguir'}
                   </button>
                 )}
-                
               </div>
             </div>
           </div>
@@ -77,7 +91,6 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
         {/* TODO: Adicionar edição inline da bio para o próprio perfil */}
         <p className="text-gray-600 whitespace-pre-line leading-relaxed">
           {userData.bio || 'Nenhuma informação disponível.'}
-          
         </p>
       </div>
 
@@ -111,9 +124,7 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
                         </div>
                       </div>
                     )}
-                    {/* TODO: Adicionar botões de interação  */}
-                   
-              
+                    {/* TODO: Adicionar botões de interação */}
                   </div>
                 </div>
               </div>
@@ -124,6 +135,14 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
         </div>
       </div>
    
+      {/* Modal de Seguidores/Seguindo */}
+      <SeguidoresModal
+        show={showModal}
+        onClose={closeModal}
+        type={modalType}
+        userId={userData.id}
+        username={userData.username}
+      />
     </div>
   );
 };

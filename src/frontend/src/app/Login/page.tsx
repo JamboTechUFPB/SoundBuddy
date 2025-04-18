@@ -19,13 +19,51 @@ export default function Login() {
   const [recoveryEmail, setRecoveryEmail] = useState('');
   const [isRecoverySubmitted, setIsRecoverySubmitted] = useState(false);
   
+  // Estados para controle de erro de autenticação
+  const [authError, setAuthError] = useState('');
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  
+  // Função para lidar com mudanças nos campos
+  const handleChange = (field: string, value: string) => {
+    if (field === 'email') {
+      setEmail(value);
+    } else if (field === 'password') {
+      setPassword(value);
+    }
+    
+    // Marca o campo como tocado
+    setTouched({...touched, [field]: true});
+    
+    // Limpa mensagem de erro de autenticação quando o usuário começa a digitar novamente
+    if (authError) {
+      setAuthError('');
+    }
+  };
+  
+  // Função para lidar com o blur dos campos
+  const handleBlur = (field: string) => {
+    setTouched({...touched, [field]: true});
+  };
+  
   /**
-   * Lida com o envio do formulário de login
-   * @param {Event} e - Evento de formulário
+   * IMPLEMENTAÇÃO REAL COMENTADA
+   * Lida com o envio do formulário de login fazendo uma chamada à API
+   * @param {React.FormEvent} e - Evento de formulário
    */
-  const handleSubmit = async (e: any) => {
+  {/*const handleSubmit = async (e: any) => {
     e.preventDefault();
     console.log('Login submitted:', { email, password });
+    
+    // Marca todos os campos como tocados para validação
+    setTouched({
+      email: true,
+      password: true
+    });
+    
+    // Verifica se os campos necessários estão preenchidos
+    if (!email || !password) {
+      return;
+    }
     
     try {
       const response = await fetch('http://localhost:8000/api/login', {
@@ -38,7 +76,7 @@ export default function Login() {
       });
   
       if (!response.ok) {
-        alert('Email ou senha inválidos');
+        setAuthError('Email ou senha incorretos. Por favor, tente novamente.');
         return;
       }
   
@@ -52,14 +90,38 @@ export default function Login() {
       router.push('/Home');
   
     } catch (error) {
-      alert('Erro ao fazer login');
+      setAuthError('Erro ao fazer login. Verifique sua conexão e tente novamente.');
       console.error(error);
     }
+  };*/}
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    // Marca todos os campos como tocados
+    setTouched({
+      email: true,
+      password: true
+    });
+    
+    // SIMULAÇÃO DE ENTRADA COLOCAR TEST@EXAMPLE.COM 
+    // substituir pela logica real de autenticação
+    if (email === 'test@example.com') {
+      setAuthError('Email ou senha incorretos. Por favor, tente novamente.');
+      return;
+    }
+    
+    // TODO: Implementar autenticação real com API/backend
+    // TODO: Adicionar tratamento de erros de autenticação
+    // TODO: Implementar armazenamento de token de sessão
+    
+    // Navega para a página inicial após "login" bem-sucedido
+    router.push('/Home');
   };
   
   /**
    * Lida com o envio do formulário de recuperação de senha
-   * @param {Event} e - Evento de formulário
+   * @param {React.FormEvent} e - Evento de formulário
    */
   const handlePasswordRecovery = (e) => {
     e.preventDefault();
@@ -91,30 +153,45 @@ export default function Login() {
         <h2 className="text-xl md:text-2xl text-white font-bold mb-4 text-center">
           Login
         </h2>
+        
+        {/* Mensagem de erro de autenticação */}
+        {authError && (
+          <div className="mb-4 p-3 border border-red-500 bg-red-500/10 text-red-500 rounded-lg text-sm">
+            {authError}
+          </div>
+        )}
+        
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-white mb-2">Email</label>
             <input
               type="email"
-              className="input_register w-full md:w-auto"
+              className={`input_register w-full md:w-auto ${touched.email && !email ? 'border-red-500' : ''}`}
               placeholder="Digite seu email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => handleChange('email', e.target.value)}
+              onBlur={() => handleBlur('email')}
               required
             />
-            {/* TODO: Adicionar validação em tempo real para o email */}
+            {touched.email && !email && (
+              <p className="text-center text-red-500 text-xs mt-1">Email é obrigatório</p>
+            )}
           </div>
-          <div className="mb-4"> {/* Modificado de mb-6 para mb-4 para acomodar o link de esqueci senha */}
+          
+          <div className="mb-4">
             <label className="block text-white mb-2">Senha</label>
             <input
               type="password"
-              className="input_register w-full md:w-auto"
+              className={`input_register w-full md:w-auto ${touched.password && !password ? 'border-red-500' : ''}`}
               placeholder="Digite sua senha"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => handleChange('password', e.target.value)}
+              onBlur={() => handleBlur('password')}
               required
             />
-
+            {touched.password && !password && (
+              <p className="text-center text-red-500 text-xs mt-1">Senha é obrigatória</p>
+            )}
             {/* TODO: Adicionar toggle para mostrar/esconder senha */}
           </div>
           
@@ -127,7 +204,6 @@ export default function Login() {
             >
               Esqueci minha senha
             </button>
-           
           </div>
           
           <div className="flex justify-center">
@@ -139,11 +215,7 @@ export default function Login() {
             >
               Entrar
             </button>
-            {/* TODO: Adicionar opção de "Manter conectado" talvez? */}
           </div>
-          
-          {/* TODO: Adicionar login com redes sociais ? */}
-        
         </form>
       </div>
       
@@ -207,7 +279,6 @@ export default function Login() {
                     Enviar
                   </button>
                 </div>
-               
               </form>
             )}
           </div>

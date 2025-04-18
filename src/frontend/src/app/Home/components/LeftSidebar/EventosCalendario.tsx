@@ -75,12 +75,12 @@ const EventosCalendarioModal = ({ show, onClose }) => {
 
   return (
     // Container principal do modal - cobre toda a tela com fundo escuro e desfoque
-    <div className="fixed inset-0 bg-black/50 backdrop-blur z-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur z-55 flex items-center justify-center">
       {/* Box do modal em si */}
       <div className="bg-black rounded-xl pt-6 pb-6 pl-6 pr-6 max-w-md w-full mx-4 shadow-2xl">
         {/* Cabeçalho do modal com título dinâmico baseado na aba ativa e botão de fechar */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-white">
+          <h2 className="text-xl font-bold text-white ">
             {activeTab === 'eventos' ? 'Próximos Eventos' : 'Adicionar Novo Evento'}
           </h2>
           <button
@@ -92,7 +92,7 @@ const EventosCalendarioModal = ({ show, onClose }) => {
         </div>
 
         {/* Navegação por abas - permite alternar entre visualizar e adicionar eventos */}
-        <div className="flex border-b border-gray-700 mb-4">
+        <div className="flex justify-center border-b border-gray-700 mb-4">
           <button
             className={`py-2 px-4 ${activeTab === 'eventos' ? 'border-b-2 border-white text-white' : 'text-gray-400'}`}
             onClick={() => setActiveTab('eventos')}
@@ -117,7 +117,6 @@ const EventosCalendarioModal = ({ show, onClose }) => {
                 <div 
                   key={evento.id} 
                   className="border-2 border-white rounded-lg p-3 hover:bg-gray-700 cursor-pointer transition-colors"
-                  // TODO: Adicionar função onClick para editar ou visualizar detalhes do evento
                 >
                   {/* Linha superior: data e local */}
                   <div className="flex justify-between mb-2">

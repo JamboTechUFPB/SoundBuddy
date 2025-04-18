@@ -110,7 +110,7 @@ const ContratacoesModal = ({ show, onClose }) => {
 
   return (
     // Container principal do modal - cobre toda a tela com fundo escuro e desfoque
-    <div className="fixed inset-0 bg-black/50 backdrop-blur z-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur z-55 flex items-center justify-center">
       {/* Box do modal em si */}
       <div className="bg-black rounded-xl pt-6 pb-6 pl-6 pr-6 max-w-md w-full mx-4 shadow-2xl">
         {/* Cabeçalho do modal com título e botão de fechar */}
@@ -125,7 +125,7 @@ const ContratacoesModal = ({ show, onClose }) => {
         </div>
 
         {/* Navegação por abas -  alterna entre visualizar e adicionar contratações */}
-        <div className="flex border-b border-gray-700 mb-4">
+        <div className="flex justify-center border-b border-gray-700 mb-4">
           <button
             className={`py-2 px-4 ${activeTab === 'minhas' ? 'border-b-2 border-white text-white' : 'text-gray-400'}`}
             onClick={() => setActiveTab('minhas')}
@@ -142,7 +142,8 @@ const ContratacoesModal = ({ show, onClose }) => {
 
         {/* Conteúdo da Tab ativa */}
         {activeTab === 'minhas' ? (
-          // Conteúdo da aba "Minhas Contratações" - Lista scrollável de contratações
+          <>
+          {/*Conteúdo da aba "Minhas Contratações" - Lista scrollável de contratações*/} 
           <div className="space-y-3 max-h-80 overflow-y-auto pb-5 scrollbar-right">
             {/* Mapeia cada contratação para um card */}
             {contratacoesAnteriores.map(contratacao => (
@@ -185,9 +186,9 @@ const ContratacoesModal = ({ show, onClose }) => {
                 Você ainda não tem contratações cadastradas.
               </div>
             )}
-            
-            {/* Botão para adicionar nova contratação - redireciona para a aba de nova contratação */}
-            <div className="mt-5 flex justify-center items-center">
+          </div>
+          {/* Botão para adicionar nova contratação - redireciona para a aba de nova contratação */}
+          <div className="mt-5 flex justify-center items-center">
               <button
                 onClick={() => setActiveTab('nova')}
                 className="px-4 py-2 border-2 border-white text-white rounded-full hover:bg-white hover:text-black transition-colors flex items-center"
@@ -195,7 +196,7 @@ const ContratacoesModal = ({ show, onClose }) => {
                 <span className="mr-1">+</span> Adicionar Contratação
               </button>
             </div>
-          </div>
+          </>
         ) : (
           // Conteúdo da aba "Nova Contratação" - Formulário para adicionar contratação
           <div className="pb-2">
