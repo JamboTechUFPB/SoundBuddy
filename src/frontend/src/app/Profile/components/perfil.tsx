@@ -1,11 +1,33 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import SeguidoresModal from '@/app/components/SeguidoresModal';
+import { EllipsisHorizontalIcon, TrashIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 const ProfileMain = ({ userData, isOwnProfile }) => {
+  // Lista de tags predefinidas disponíveis para seleção
+  const tags = ['Jazz', 'Rock', 'Pop', 'Eletrônica', 'Clássica', 'MPB', 'tag1', 'tag2', 'tag3', 'tag4' ];
+
   // Estado para controlar a exibição do modal
   const [showModal, setShowModal] = useState(false);
   // Estado para definir o tipo de lista a ser exibida no modal (seguidores ou seguindo)
   const [modalType, setModalType] = useState('');
+  // Estado para controlar o processo de follow/unfollow
+  const [isFollowing, setIsFollowing] = useState(userData?.isFollowing || false);
+  // Estado para indicar loading durante as requisições
+  const [isLoading, setIsLoading] = useState(false);
+  // Estado para edição do perfil
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  // Estado para edição da bio
+  const [bio, setBio] = useState(userData?.bio || '');
+  // Estado para armazenar os posts localmente (para permitir exclusão local)
+  const [posts, setPosts] = useState(userData?.posts || []);
+  // Estado para tags do usuário
+  const [selectedTags, setSelectedTags] = useState(userData?.tags || ['Jazz', 'Rock', 'Pop', 'Eletrônica']);
+  // Estado para mensagem de erro das tags
+  const [tagError, setTagError] = useState('');
+  // Ref para input de arquivo da foto de perfil
+  const fileInputRef = useRef(null);
+  // Estado para preview da nova foto de perfil
+  const [imagePreview, setImagePreview] = useState(null);
   
   if (!userData) {
     return <div className="p-4 text-center">Carregando perfil...</div>;
@@ -22,8 +44,189 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
     setShowModal(false);
   };
 
-  // TODO: Implementar função de edição de perfil quando botão for clicado
-  // TODO: Implementar função de seguir/deixar de seguir quando botão for clicado
+  // Função para iniciar edição do perfil
+  const handleEditProfile = () => {
+    setIsEditingProfile(true);
+    setBio(userData.bio || '');
+    setSelectedTags(userData.tags || ['Jazz', 'Rock', 'Pop', 'Eletrônica']);
+    setImagePreview(null);
+    setTagError('');
+  };
+
+  // Função para validar as tags
+  const validateTags = () => {
+    if (selectedTags.length < 3) {
+      setTagError('Você precisa ter no mínimo 3 tags');
+      return false;
+    }
+    if (selectedTags.length > 6) {
+      setTagError('Você pode ter no máximo 6 tags');
+      return false;
+    }
+    setTagError('');
+    return true;
+  };
+
+  // Função para alternar a seleção de uma tag
+  const toggleTag = (tag) => {
+    if (selectedTags.includes(tag)) {
+      // Se já está selecionada e não vai ficar com menos do que o mínimo, remove
+      if (selectedTags.length > 3) {
+        setSelectedTags(selectedTags.filter(t => t !== tag));
+      } else {
+        setTagError('Você precisa ter no mínimo 3 tags');
+      }
+    } else {
+      // Se não está selecionada e não vai exceder o máximo, adiciona
+      if (selectedTags.length < 6) {
+        setSelectedTags([...selectedTags, tag]);
+        setTagError('');
+      } else {
+        setTagError('Você pode ter no máximo 6 tags');
+      }
+    }
+  };
+
+  // Função para salvar alterações do perfil
+  const handleSaveProfile = async () => {
+    // Validar as tags antes de salvar
+    if (!validateTags()) {
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      // Simular uma requisição bem-sucedida
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Atualizar os dados localmente
+      userData.bio = bio;
+      userData.tags = selectedTags;
+      
+      // Se houver uma nova imagem, atualizá-la
+      if (imagePreview) {
+        userData.image = imagePreview;
+      }
+      
+      // Finalizar edição
+      setIsEditingProfile(false);
+      
+      /* 
+      // Implementação real com backend
+      const formData = new FormData();
+      formData.append('bio', bio);
+      formData.append('tags', JSON.stringify(selectedTags));
+      
+      if (fileInputRef.current.files[0]) {
+        formData.append('profileImage', fileInputRef.current.files[0]);
+      }
+      
+      const response = await fetch(`/api/users/${userData.id}`, {
+        method: 'PUT',
+        body: formData,
+      });
+      
+      if (!response.ok) throw new Error('Falha ao atualizar perfil');
+      
+      const updatedUser = await response.json();
+      // Atualizar o estado global ou revalidar a página
+      */
+    } catch (error) {
+      console.error('Erro ao atualizar perfil:', error);
+      // Mostrar uma notificação de erro
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Função para cancelar edição do perfil
+  const handleCancelEdit = () => {
+    setIsEditingProfile(false);
+    setImagePreview(null);
+    setTagError('');
+  };
+
+  // Função para lidar com a alteração da foto de perfil
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Função para seguir/deixar de seguir usuário
+  const handleFollowToggle = async () => {
+    setIsLoading(true);
+    
+    try {
+      // Simular requisição
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Atualizar estado localmente
+      setIsFollowing(!isFollowing);
+      
+      // Atualizar contagem de seguidores
+      userData.followers = isFollowing 
+        ? Math.max(0, userData.followers - 1) 
+        : userData.followers + 1;
+      
+      /* 
+      // Implementação real
+      const endpoint = `/api/users/${userData.id}/${isFollowing ? 'unfollow' : 'follow'}`;
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) throw new Error('Falha na operação');
+      
+      const data = await response.json();
+      // Atualizar estado global ou revalidar
+      */
+    } catch (error) {
+      // Reverter mudanças locais em caso de erro
+      setIsFollowing(isFollowing);
+      console.error('Erro:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // Função para excluir post
+  const handleDeletePost = async (postId) => {
+    if (!window.confirm('Tem certeza que deseja excluir esta publicação?')) {
+      return;
+    }
+    
+    try {
+      // Simular requisição
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Remover post localmente
+      setPosts(posts.filter(post => post.id !== postId));
+      
+      /* 
+      // Implementação real
+      const response = await fetch(`/api/posts/${postId}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) throw new Error('Falha ao excluir publicação');
+      
+      // Atualizar estado global ou revalidar
+      */
+    } catch (error) {
+      console.error('Erro ao excluir post:', error);
+      // Mostrar notificação de erro
+    }
+  };
 
   return (
     <div className="overflow-y-auto space-y-6 max-w-4xl mx-auto pb-16">
@@ -32,11 +235,34 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
         <div className="flex flex-col lg:flex-row items-center gap-6">
           {/* Foto de Perfil */}
           <div className="relative">
-            <img
-              src={userData.image}
-              alt="Foto de perfil"
-              className="w-32 h-32 rounded-full border-4 border-blue-500 object-cover"
-            />
+            {isEditingProfile ? (
+              <div className="relative">
+                <img
+                  src={imagePreview || userData.image}
+                  alt="Foto de perfil"
+                  className="w-32 h-32 rounded-full border-4 border-blue-500 object-cover"
+                />
+                <div 
+                  className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full cursor-pointer"
+                  onClick={() => fileInputRef.current.click()}
+                >
+                  <span className="text-white text-sm font-medium">Alterar foto</span>
+                </div>
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  className="hidden" 
+                  accept="image/*"
+                  onChange={handleImageChange}
+                />
+              </div>
+            ) : (
+              <img
+                src={userData.image}
+                alt="Foto de perfil"
+                className="w-32 h-32 rounded-full border-4 border-blue-500 object-cover"
+              />
+            )}
           </div>
 
           {/* Informações do Usuário */}
@@ -66,17 +292,40 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
               </div>
               
               {/* Botões posicionados à direita */}
-              <div className="mt-4 lg:mt-12 lg:ml-auto">
+              <div className="mt-4 lg:mt-0 lg:ml-auto">
                 {isOwnProfile ? (
-                  // TODO: Implementar modal ou página de edição de perfil
-                  <button className="px-4 py-2 border-2 border-white rounded-full hover:bg-white hover:text-black transition-colors">
-                    Editar perfil
-                  </button>
+                  isEditingProfile ? (
+                    <div className="flex gap-2">
+                      <button 
+                        className="px-4 py-2 bg-white text-black rounded-full hover:bg-gray-200 transition-colors"
+                        onClick={handleSaveProfile}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? 'Salvando...' : 'Salvar'}
+                      </button>
+                      <button 
+                        className="px-4 py-2 border-2 border-white rounded-full hover:bg-white hover:text-black transition-colors"
+                        onClick={handleCancelEdit}
+                        disabled={isLoading}
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  ) : (
+                    <button 
+                      className="px-4 py-2 border-2 border-white rounded-full hover:bg-white hover:text-black transition-colors"
+                      onClick={handleEditProfile}
+                    >
+                      Editar perfil
+                    </button>
+                  )
                 ) : (
-                  // TODO: Adicionar estado de loading ao botão durante a requisição
-                  // TODO: Implementar lógica de seguir/deixar de seguir com chamada à API
-                  <button className="px-4 py-2 border-2 border-white rounded-full hover:bg-white hover:text-black transition-colors">
-                    {userData.isFollowing ? 'Deixar de seguir' : 'Seguir'}
+                  <button 
+                    className={`px-4 py-2 border-2 border-white rounded-full hover:bg-white hover:text-black transition-colors ${isLoading ? 'opacity-70' : ''}`}
+                    onClick={handleFollowToggle}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Processando...' : isFollowing ? 'Deixar de seguir' : 'Seguir'}
                   </button>
                 )}
               </div>
@@ -85,23 +334,62 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
         </div>
       </div>
 
+      {/* Seção de Tags */}
+      <div className="flex flex-wrap justify-center gap-2 px-4">
+        {isEditingProfile && isOwnProfile ? (
+          <>
+            {tags.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => toggleTag(tag)}
+                className={`border-2 ${selectedTags.includes(tag) ? 'bg-white text-black' : 'border-white text-white'} 
+                           px-3 py-1 rounded-full hover:opacity-80 transition-colors bg-transparent`}
+              >
+                #{tag}
+              </button>
+            ))}
+            {tagError && (
+              <div className="w-full text-center mt-2 text-red-500">
+                {tagError}
+              </div>
+            )}
+          </>
+        ) : (
+          selectedTags.map((tag) => (
+            <div
+              key={tag}
+              className="border-2 border-white text-white px-3 py-1 rounded-full"
+            >
+              #{tag}
+            </div>
+          ))
+        )}
+      </div>
+
       {/* Seção Sobre */}
       <div className="bg-white rounded-xl shadow-md p-6">
         <h2 className="text-2xl font-bold mb-4 text-gray-800">Sobre</h2>
-        {/* TODO: Adicionar edição inline da bio para o próprio perfil */}
-        <p className="text-gray-600 whitespace-pre-line leading-relaxed">
-          {userData.bio || 'Nenhuma informação disponível.'}
-        </p>
+        {isEditingProfile && isOwnProfile ? (
+          <textarea
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-32"
+            placeholder="Escreva algo sobre você..."
+          />
+        ) : (
+          <p className="text-gray-600 whitespace-pre-line leading-relaxed">
+            {userData.bio || 'Nenhuma informação disponível.'}
+          </p>
+        )}
       </div>
 
       {/* Seção de Posts */}
       <div className="bg-white rounded-xl shadow-md p-6">
         <h3 className="text-2xl font-bold mb-6 text-gray-800">Publicações</h3>
-        {/* TODO: Adicionar sistema de filtro/categorização de publicações */}
-       
+        
         <div className="space-y-6">
-          {userData.posts && userData.posts.length > 0 ? (
-            userData.posts.map((post) => (
+          {posts && posts.length > 0 ? (
+            posts.map((post) => (
               <div key={post.id} className="border-b border-gray-100 pb-6 last:border-b-0">
                 <div className="flex items-start gap-4">
                   <img 
@@ -110,21 +398,43 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
                     alt="Autor"
                   />
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="font-semibold text-gray-800">{post.author}</span>
-                      <span className="text-gray-400 text-sm">{post.date}</span>
-                      {/* TODO: Adicionar menu de opções para editar/excluir post se for o autor */}
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-3">
+                        <span className="font-semibold text-gray-800">{post.author}</span>
+                        <span className="text-gray-400 text-sm">{post.date}</span>
+                      </div>
+                      
+                      {/* Opções de post para o próprio usuário - Apenas excluir */}
+                      {isOwnProfile && (
+                        <div className="relative group">
+                          <button className="text-gray-500 hover:text-gray-700 p-1">
+                            <EllipsisHorizontalIcon className="h-5 w-5" />
+                          </button>
+                          
+                          <div className="absolute right-0 mt-1 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                            <div className="py-1">
+                              <button 
+                                className="flex items-center w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                onClick={() => handleDeletePost(post.id)}
+                              >
+                                <TrashIcon className="h-4 w-4 mr-2" />
+                                Excluir publicação
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
+                    
                     <p className="text-gray-600 mb-3">{post.content}</p>
+                    
                     {post.media && (
                       <div className="bg-gray-100 rounded-lg p-2">
-                        {/* TODO: Implementar exibição real da mídia (imagem, vídeo, áudio) */}
                         <div className="aspect-video bg-gray-200 rounded-md flex items-center justify-center">
                           <span className="text-gray-500">Mídia</span>
                         </div>
                       </div>
                     )}
-                    {/* TODO: Adicionar botões de interação */}
                   </div>
                 </div>
               </div>

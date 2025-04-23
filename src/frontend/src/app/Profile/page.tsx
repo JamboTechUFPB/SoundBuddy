@@ -38,8 +38,8 @@ const ProfilePage = () => {
     Prêmios:
     🏆 Melhor Álbum Independente 2022
     🥇 Festival de Música de Curitiba 2021`,
-    followers: '2.345',
-    following: '1.234',
+    followers: 2345,
+    following: 1234,
     posts: [
       {
         id: 1,
