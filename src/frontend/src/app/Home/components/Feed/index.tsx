@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { BookmarkIcon, PaperAirplaneIcon, MusicalNoteIcon } from '@heroicons/react/24/outline';
-import Image from 'next/image';
+
 import NewPostModal from './NewPostModal';
 import ChatModal from '@/app/components/ChatModal';
 
@@ -22,6 +23,8 @@ const Feed = () => {
   const [enlargedImage, setEnlargedImage] = useState(null);
   // Estado para controlar a ampliação de vídeos
   const [enlargedVideo, setEnlargedVideo] = useState(null);
+  // Hook de roteamento do Next.js
+  const router = useRouter();
   
   // TODO: Integrar com API de posts/feed
   // Dados mockados de posts - agora incluindo mídia
@@ -147,6 +150,11 @@ const Feed = () => {
     });
   };
 
+  // navegação perfil
+  const handleProfileClick = () => {
+    router.push('/Profile');
+  };
+
   /**
    * Renderiza um componente de mídia baseado no tipo (imagem, vídeo ou áudio)
    * @param {object} post - Post contendo dados de mídia
@@ -257,7 +265,7 @@ const Feed = () => {
                     alt={`Perfil de ${post.username}`}
                     className="w-10 h-10 rounded-full object-cover mr-3"
                   />
-                  <span className="font-semibold text-gray-800">@{post.username}</span>
+                  <span onClick={handleProfileClick}  className="font-semibold text-gray-800 cursor-pointer">@{post.username}</span>
                 </div>
 
                 {/* Botão de salvar post */}
@@ -266,7 +274,7 @@ const Feed = () => {
                   className="absolute top-2 right-2 p-2 hover:bg-gray-200 rounded-full transition-colors"
                 >
                   <BookmarkIcon 
-                    className={`w-5 h-5 ${savedPosts.has(post.id) ? 'text-blue-500 fill-current' : 'text-gray-400'}`}
+                    className={`w-5 h-5 cursor-pointer ${savedPosts.has(post.id) ? 'text-blue-500 fill-current' : 'text-gray-400'}`}
                   />
                 </button>
 
@@ -281,7 +289,7 @@ const Feed = () => {
                   onClick={() => handleOpenChat(post)}
                   className="absolute bottom-2 right-2 p-2 hover:bg-gray-200 rounded-full transition-colors"
                 >
-                  <PaperAirplaneIcon className="w-5 h-5 text-gray-600 -rotate-45" />
+                  <PaperAirplaneIcon className="w-5 h-5 cursor-pointer text-gray-600 -rotate-45" />
                 </button>
               </div>
             ))}

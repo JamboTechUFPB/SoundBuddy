@@ -17,11 +17,11 @@ const EventosCalendarioModal = ({ show, onClose }) => {
   // Dados de exemplo para próximos eventos
   // TODO: Na implementação real, devem vir de uma API ou banco de dados
   const eventosProximos = [
-    { id: 1, data: '15/04/2025', titulo: 'Festival de Jazz', local: 'Teatro Municipal', contratante: 'Secretaria de Cultura' },
-    { id: 2, data: '22/04/2025', titulo: 'Show MPB ao Vivo', local: 'Parque da Cidade', contratante: 'Produtora Musical BR' },
-    { id: 3, data: '01/05/2025', titulo: 'Jam Session', local: 'Blue Note Club', contratante: 'Blue Note' },
-    { id: 4, data: '10/05/2025', titulo: 'Concerto Folk', local: 'Centro Cultural', contratante: 'Associação Cultural' },
-    { id: 5, data: '18/05/2025', titulo: 'Indie Music Fest', local: 'Arena Multiuso', contratante: 'Indie Productions' },
+    { id: 1, data: '15/04/2025', titulo: 'Festival de Jazz', local: 'Teatro Municipal', contratante: 'Secretaria de Cultura', horario: '20:00' },
+    { id: 2, data: '22/04/2025', titulo: 'Show MPB ao Vivo', local: 'Parque da Cidade', contratante: 'Produtora Musical BR', horario: '18:00' },
+    { id: 3, data: '01/05/2025', titulo: 'Jam Session', local: 'Blue Note Club', contratante: 'Blue Note', horario: '21:00' },
+    { id: 4, data: '10/05/2025', titulo: 'Concerto Folk', local: 'Centro Cultural', contratante: 'Associação Cultural', horario: '19:00' },
+    { id: 5, data: '18/05/2025', titulo: 'Indie Music Fest', local: 'Arena Multiuso', contratante: 'Indie Productions', horario: '16:00' },
   ];
 
   // Estado para armazenar os dados do formulário de novo evento
@@ -127,8 +127,12 @@ const EventosCalendarioModal = ({ show, onClose }) => {
                   {/* Nome/título do evento */}
                   <p className="text-white">{evento.titulo}</p>
                   
-                  {/* Linha inferior: contratante */}
-                  <p className="text-gray-300 text-sm mt-1">Contratante: {evento.contratante}</p>
+                  {/* Linha inferior: contratante e horario */}
+                  <div className="flex justify-between mt-2">
+                    <p className="text-gray-300 text-sm mt-1">Contratante: {evento.contratante}</p>
+                    <p className ="text-gray-300 text-sm mt-1">Horário: {evento.horario}</p>
+                  </div>
+                  
                 </div>
               ))}
               
