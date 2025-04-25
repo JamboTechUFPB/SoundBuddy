@@ -136,7 +136,7 @@ const LeftSidebar = () => {
               {Tags.map((tag, index) => (
                 <span 
                   key={index}
-                  className="px-3 py-1 bg-gray-800 rounded-full text-xs hover:bg-gray-700 transition-colors cursor-pointer text-center truncate"
+                  className="px-3 py-1 bg-gray-800 rounded-full text-xs text-center truncate"
                 >
                   #{tag}
                 </span>

@@ -196,15 +196,13 @@ const PostsSalvosModal = ({ show, onClose }) => {
                       {/* Botões de interação */}
                       <div className="flex items-center justify-end mt-2 space-x-2">
                         <button 
-                          className="p-1 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 transition-all duration-200 ease-in-out"
+                          className="p-1 text-gray-500 rounded-full hover:bg-gray-300 transition-all duration-200 ease-in-out"
                           onClick={() => removerPostSalvo(post.id)}
                           title="Remover dos salvos"
                         >
                           <BookmarkIcon className="w-5 h-5 text-blue-500 fill-current" />
                         </button>
-                        <button className="p-1 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100">
-                          <PaperAirplaneIcon className="w-5 h-5 -rotate-45" />
-                        </button>
+        
                       </div>
                     </div>
                   </div>

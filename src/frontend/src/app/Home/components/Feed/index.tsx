@@ -234,7 +234,7 @@ const Feed = () => {
       <button
         onClick={() => setShowModal(true)}
         className="fixed z-40 bottom-5 left-1/2 -translate-x-1/2
-        bg-black text-white rounded-full w-14 h-14
+        bg-black shadow-lg text-white rounded-full w-14 h-14
         flex items-center justify-center text-3xl
         hover:bg-gray-800 shadow-xl transition-all"
       >
@@ -249,11 +249,12 @@ const Feed = () => {
       />
 
       {/* Container principal do feed com posicionamento fixo */}
-      <div className="fixed top-[60px] bottom-[15px] left-1/2 -translate-x-1/2 w-full max-w-4xl">
-        <div className="h-full bg-white rounded-xl mx-auto overflow-hidden">
-          {/* Gradiente de fade-out na parte inferior */}
-          <div className="fixed bottom-0 left-0 right-0 h-30 bg-gradient-to-t from-white via-white to-transparent backdrop-blur-xsm pointer-events-none z-50" />
+      <div className="fixed top-[60px] bottom-0 md:bottom-[15px] left-1/2 -translate-x-1/2 w-full max-w-4xl">
+        <div className="h-full bg-gradient-to-t from-white/10 to-transparent rounded-xl mx-auto overflow-hidden scrollbar-right shadow-2xl relative">
+          {/* Gradiente de fade-out na parte inferior 
           
+          <div className="fixed bottom-0 rounded-xl left-0 right-0 h-25 z-50 bg-gradient-to-t from-zinc-700/70 to-transparent" />*/}
+
           {/* Área rolável com os posts */}
           <div className="h-full overflow-y-auto px-4 py-6 pb-25 space-y-6">
             {posts.map((post) => (

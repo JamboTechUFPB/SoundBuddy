@@ -142,14 +142,16 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-black md:bg-gray-100 p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-black md:bg-gradient-to-br from-zinc-900 via-zinc-700 to-zinc-800 p-4">
       {/* Título SoundBuddy */}
-      <h1 className="text-3xl md:text-5xl font-bold text-white md:text-black mb-6 md:mb-10">
+      <div className="absolute inset-0 bg-zinc-900/10 backdrop-blur-3xl" />
+
+      <h1 className="text-3xl md:text-5xl font-bold text-white md:text-zinc-100 mb-6 md:mb-10 z-10">
         SoundBuddy
       </h1>
       
       {/* Container do Login */}
-      <div className="w-full md:w-100 p-6 bg-black shadow-lg rounded-xl md:rounded-3xl">
+      <div className="w-full md:w-100 p-6 bg-black/30 shadow-2xl shadow-white/20 rounded-xl md:rounded-3xl z-10">
         <h2 className="text-xl md:text-2xl text-white font-bold mb-4 text-center">
           Login
         </h2>
@@ -220,7 +222,7 @@ export default function Login() {
       </div>
       
       {/* Texto abaixo do card */}
-      <p className="mt-6 md:mt-8 text-lg md:text-xl text-white md:text-gray-700 font-medium">
+      <p className="mt-6 md:mt-8 text-lg md:text-xl text-white md:text-white font-medium z-10">
         IT'S ALL ABOUT MUSIC
       </p>
       
