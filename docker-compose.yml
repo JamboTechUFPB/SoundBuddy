@@ -6,13 +6,13 @@ services:
       context: ./src/frontend
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "${FRONT_PORT}:3000"
     environment:
       - NODE_ENV=development
-      - NEXT_PUBLIC_API_URL=http://backend:8000
+      - NEXT_PUBLIC_API_URL=http://backend:${BACK_PORT}
     volumes:
       - ./src/frontend:/app
-      - /app/node_modules
+      - frontend_node_modules:/app/node_modules
     depends_on:
       - backend
     networks:
@@ -23,15 +23,40 @@ services:
       context: ./src/backend
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "${BACK_PORT}:8000"
     environment:
       - NODE_ENV=development
+      - MONGO_URI=mongodb://localhost:${DB_PORT}/${DB_NAME}
+      - PORT=${BACK_PORT}
+      - FRONT_URL=http://localhost:${FRONT_PORT}
+      - FRONT_PORT=${FRONT_PORT}
+      - BACK_PORT=${BACK_PORT}
+      - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
+      - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
     volumes:
       - ./src/backend:/app
-      - /app/node_modules
+      - backend_node_modules:/app/node_modules
+    depends_on:
+      - mongodb
+    networks:
+      - soundbuddy-network
+
+  mongodb:
+    image: mongo
+    container_name: ${DB_NAME}-mongo-container
+    ports:
+      - "${DB_PORT}:27017"
+    volumes:
+      - ./src/backend/mongo-data-docker:/data/db
+    command: mongod --logpath /dev/null --logappend --quiet
+    user: "${UID}:${GID}"
     networks:
       - soundbuddy-network
 
 networks:
   soundbuddy-network:
     driver: bridge
+
+volumes:
+  backend_node_modules:
+  frontend_node_modules:

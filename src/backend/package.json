@@ -6,8 +6,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "bash run_mongo.sh && nodemon --watch src --exec node index.js",
-    "start": "node index.js",
-    "test": "jest"
+    "dev:docker": "nodemon --watch src --exec node index.js",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",

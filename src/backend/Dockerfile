@@ -1,4 +1,4 @@
-FROM node:slim
+FROM node:23.11.0-slim
 
 WORKDIR /app
 
@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "dev:docker"]

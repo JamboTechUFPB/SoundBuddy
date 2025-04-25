@@ -25,8 +25,9 @@ const Step1 = ({ formData, setFormData, handleNextStep }: StepProps) => {
       description: 'Contrate músicos enquanto oferece seus próprios serviços, acessando todos os recursos de ambos os tipos de conta.'
     },
     {
-      type: 'Cliente',
-      description: 'Indivíduos ou organizações que buscam contratar músicos ou profissionais da área musical para eventos e produções.'
+      type: 'Contratante',
+      description: 'Indivíduos ou organizações que buscam contratar músicos ou profissionais da área musical para eventos e produções.',
+      modelName: 'contractor'
     }
   ];
 
