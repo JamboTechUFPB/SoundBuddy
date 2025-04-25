@@ -29,7 +29,7 @@ const Register = () => {
     if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
-  const handleSubmit = async () => {
+  /*const handleSubmit = async () => {
     try {
       if (formData.password !== formData.confirmPassword) {
         alert("Senhas não coincidem");
@@ -69,6 +69,12 @@ const Register = () => {
       console.error('Error during registration:', error);
       alert('Erro ao criar conta. Tente novamente.');
     }
+  };*/
+
+
+  const handleSubmit = () => {
+    // Lógica de envio do formulário
+    router.push('/Home');
   };
 
   return (

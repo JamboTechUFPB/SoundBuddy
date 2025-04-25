@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { BookmarkIcon, PaperAirplaneIcon, MusicalNoteIcon } from '@heroicons/react/24/outline';
-import Image from 'next/image';
+
 import NewPostModal from './NewPostModal';
 import ChatModal from '@/app/components/ChatModal';
 
@@ -22,6 +23,8 @@ const Feed = () => {
   const [enlargedImage, setEnlargedImage] = useState(null);
   // Estado para controlar a ampliação de vídeos
   const [enlargedVideo, setEnlargedVideo] = useState(null);
+  // Hook de roteamento do Next.js
+  const router = useRouter();
   
   // TODO: Integrar com API de posts/feed
   // Dados mockados de posts - agora incluindo mídia
@@ -147,6 +150,11 @@ const Feed = () => {
     });
   };
 
+  // navegação perfil
+  const handleProfileClick = () => {
+    router.push('/Profile');
+  };
+
   /**
    * Renderiza um componente de mídia baseado no tipo (imagem, vídeo ou áudio)
    * @param {object} post - Post contendo dados de mídia
@@ -226,7 +234,7 @@ const Feed = () => {
       <button
         onClick={() => setShowModal(true)}
         className="fixed z-40 bottom-5 left-1/2 -translate-x-1/2
-        bg-black text-white rounded-full w-14 h-14
+        bg-black shadow-lg text-white rounded-full w-14 h-14
         flex items-center justify-center text-3xl
         hover:bg-gray-800 shadow-xl transition-all"
       >
@@ -241,11 +249,12 @@ const Feed = () => {
       />
 
       {/* Container principal do feed com posicionamento fixo */}
-      <div className="fixed top-[60px] bottom-[15px] left-1/2 -translate-x-1/2 w-full max-w-4xl">
-        <div className="h-full bg-white rounded-xl mx-auto overflow-hidden">
-          {/* Gradiente de fade-out na parte inferior */}
-          <div className="fixed bottom-0 left-0 right-0 h-30 bg-gradient-to-t from-white via-white to-transparent backdrop-blur-xsm pointer-events-none z-50" />
+      <div className="fixed top-[60px] bottom-0 md:bottom-[15px] left-1/2 -translate-x-1/2 w-full max-w-4xl">
+        <div className="h-full bg-gradient-to-t from-white/10 to-transparent rounded-xl mx-auto overflow-hidden scrollbar-right shadow-2xl relative">
+          {/* Gradiente de fade-out na parte inferior 
           
+          <div className="fixed bottom-0 rounded-xl left-0 right-0 h-25 z-50 bg-gradient-to-t from-zinc-700/70 to-transparent" />*/}
+
           {/* Área rolável com os posts */}
           <div className="h-full overflow-y-auto px-4 py-6 pb-25 space-y-6">
             {posts.map((post) => (
@@ -257,7 +266,7 @@ const Feed = () => {
                     alt={`Perfil de ${post.username}`}
                     className="w-10 h-10 rounded-full object-cover mr-3"
                   />
-                  <span className="font-semibold text-gray-800">@{post.username}</span>
+                  <span onClick={handleProfileClick}  className="font-semibold text-gray-800 cursor-pointer">@{post.username}</span>
                 </div>
 
                 {/* Botão de salvar post */}
@@ -266,7 +275,7 @@ const Feed = () => {
                   className="absolute top-2 right-2 p-2 hover:bg-gray-200 rounded-full transition-colors"
                 >
                   <BookmarkIcon 
-                    className={`w-5 h-5 ${savedPosts.has(post.id) ? 'text-blue-500 fill-current' : 'text-gray-400'}`}
+                    className={`w-5 h-5 cursor-pointer ${savedPosts.has(post.id) ? 'text-blue-500 fill-current' : 'text-gray-400'}`}
                   />
                 </button>
 
@@ -281,7 +290,7 @@ const Feed = () => {
                   onClick={() => handleOpenChat(post)}
                   className="absolute bottom-2 right-2 p-2 hover:bg-gray-200 rounded-full transition-colors"
                 >
-                  <PaperAirplaneIcon className="w-5 h-5 text-gray-600 -rotate-45" />
+                  <PaperAirplaneIcon className="w-5 h-5 cursor-pointer text-gray-600 -rotate-45" />
                 </button>
               </div>
             ))}
