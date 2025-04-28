@@ -89,7 +89,7 @@ const LeftSidebar = () => {
     <>
       {/* Barra lateral principal */}
       <nav 
-        className={`bg-black fixed left-0 top-[60px] bottom-[15px] w-64 rounded-r-xl transition-transform duration-300 z-50 flex flex-col
+        className={`bg-black fixed border-2 border-gray-700 shadow-sm shadow-blue-950 left-0 top-[60px] bottom-[15px] w-64 rounded-r-xl transition-transform duration-300 z-50 flex flex-col
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >

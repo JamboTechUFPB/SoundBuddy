@@ -142,12 +142,12 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-black md:bg-gradient-to-br from-zinc-900 via-zinc-700 to-zinc-800 p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-black md:bg-gradient-to-br from-zinc-900 via-gray-700 to-zinc-800 p-4">
       {/* Título SoundBuddy */}
       <div className="absolute inset-0 bg-zinc-900/10 backdrop-blur-3xl" />
 
       <h1 className="text-3xl md:text-5xl font-bold text-white md:text-zinc-100 mb-6 md:mb-10 z-10">
-        SoundBuddy
+        Soundbuddy
       </h1>
       
       {/* Container do Login */}
