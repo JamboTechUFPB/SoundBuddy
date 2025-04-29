@@ -46,14 +46,16 @@ export default function Login() {
   };
   
   /**
-   * IMPLEMENTAÇÃO REAL COMENTADA
    * Lida com o envio do formulário de login fazendo uma chamada à API
    * @param {React.FormEvent} e - Evento de formulário
    */
-  {/*const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: any) => {
+    // 1. Autenticação real com API
     e.preventDefault();
     console.log('Login submitted:', { email, password });
     
+
+    // 2. Adicionar tratamento de erros de autenticação
     // Marca todos os campos como tocados para validação
     setTouched({
       email: true,
@@ -83,6 +85,7 @@ export default function Login() {
       const data = await response.json();
       
       // Salva tokens
+      // 3. armazenamento de token de sessão
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('refreshToken', data.refreshToken);
   
@@ -93,30 +96,6 @@ export default function Login() {
       setAuthError('Erro ao fazer login. Verifique sua conexão e tente novamente.');
       console.error(error);
     }
-  };*/}
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // Marca todos os campos como tocados
-    setTouched({
-      email: true,
-      password: true
-    });
-    
-    // SIMULAÇÃO DE ENTRADA COLOCAR TEST@EXAMPLE.COM 
-    // substituir pela logica real de autenticação
-    if (email === 'test@example.com') {
-      setAuthError('Email ou senha incorretos. Por favor, tente novamente.');
-      return;
-    }
-    
-    // TODO: Implementar autenticação real com API/backend
-    // TODO: Adicionar tratamento de erros de autenticação
-    // TODO: Implementar armazenamento de token de sessão
-    
-    // Navega para a página inicial após "login" bem-sucedido
-    router.push('/Home');
   };
   
   /**
