@@ -89,7 +89,7 @@ const LeftSidebar = () => {
     <>
       {/* Barra lateral principal */}
       <nav 
-        className={`bg-black fixed left-0 top-[60px] bottom-[15px] w-64 rounded-r-xl transition-transform duration-300 z-50 flex flex-col
+        className={`bg-black fixed border-2 border-gray-700 shadow-sm shadow-blue-950 left-0 top-[60px] bottom-[15px] w-64 rounded-r-xl transition-transform duration-300 z-50 flex flex-col
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
@@ -171,10 +171,10 @@ const LeftSidebar = () => {
 
         {/* Área fixa de rodapé com botões de ação */}
         <div className="border-t text-white border-gray-700 pt-4 space-y-2 p-5">
-          <button className="w-full rounded-full bg-gray-800 hover:bg-gray-700 p-1 text-sm transition-colors">
+          {/*<button className="w-full rounded-full bg-gray-800 hover:bg-gray-700 p-1 text-sm transition-colors">
             Configurações
-            {/* TODO: Implementar navegação para página de configurações */}
-          </button>
+             TODO: Implementar navegação para página de configurações 
+          </button>*/}
           <button 
           onClick={handleLogout}
           className="w-full rounded-full bg-red-600 hover:bg-red-400 p-1 text-sm transition-colors">

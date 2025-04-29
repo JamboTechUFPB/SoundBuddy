@@ -30,7 +30,7 @@ export default function Landing() {
 
   return (
     // Container principal - ocupa toda a altura da tela com fundo escuro
-    <div className="min-h-screen bg-conic-180 from-zinc-900 via-zinc-700 to-zinc-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-conic-180 from-zinc-900 via-gray-700 to-zinc-900 flex items-center justify-center p-4">
 
       <div className="absolute inset-0 bg-zinc-900/10 backdrop-blur-2xl" />
 
@@ -39,7 +39,7 @@ export default function Landing() {
         {/* Seção de título e tagline */}
         <div className="space-y-3 md:space-y-4">
           {/* Título principal da aplicação */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-slate-200">
             Soundbuddy
           </h1>
           {/* Slogan da aplicação */}
