@@ -17,11 +17,11 @@ const EventosCalendarioModal = ({ show, onClose }) => {
   // Dados de exemplo para próximos eventos
   // TODO: Na implementação real, devem vir de uma API ou banco de dados
   const eventosProximos = [
-    { id: 1, data: '15/04/2025', titulo: 'Festival de Jazz', local: 'Teatro Municipal', contratante: 'Secretaria de Cultura' },
-    { id: 2, data: '22/04/2025', titulo: 'Show MPB ao Vivo', local: 'Parque da Cidade', contratante: 'Produtora Musical BR' },
-    { id: 3, data: '01/05/2025', titulo: 'Jam Session', local: 'Blue Note Club', contratante: 'Blue Note' },
-    { id: 4, data: '10/05/2025', titulo: 'Concerto Folk', local: 'Centro Cultural', contratante: 'Associação Cultural' },
-    { id: 5, data: '18/05/2025', titulo: 'Indie Music Fest', local: 'Arena Multiuso', contratante: 'Indie Productions' },
+    { id: 1, data: '15/04/2025', titulo: 'Festival de Jazz', local: 'Teatro Municipal', contratante: 'Secretaria de Cultura', horario: '20:00' },
+    { id: 2, data: '22/04/2025', titulo: 'Show MPB ao Vivo', local: 'Parque da Cidade', contratante: 'Produtora Musical BR', horario: '18:00' },
+    { id: 3, data: '01/05/2025', titulo: 'Jam Session', local: 'Blue Note Club', contratante: 'Blue Note', horario: '21:00' },
+    { id: 4, data: '10/05/2025', titulo: 'Concerto Folk', local: 'Centro Cultural', contratante: 'Associação Cultural', horario: '19:00' },
+    { id: 5, data: '18/05/2025', titulo: 'Indie Music Fest', local: 'Arena Multiuso', contratante: 'Indie Productions', horario: '16:00' },
   ];
 
   // Estado para armazenar os dados do formulário de novo evento
@@ -75,12 +75,12 @@ const EventosCalendarioModal = ({ show, onClose }) => {
 
   return (
     // Container principal do modal - cobre toda a tela com fundo escuro e desfoque
-    <div className="fixed inset-0 bg-black/50 backdrop-blur z-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur z-55 flex items-center justify-center">
       {/* Box do modal em si */}
       <div className="bg-black rounded-xl pt-6 pb-6 pl-6 pr-6 max-w-md w-full mx-4 shadow-2xl">
         {/* Cabeçalho do modal com título dinâmico baseado na aba ativa e botão de fechar */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-white">
+          <h2 className="text-xl font-bold text-white ">
             {activeTab === 'eventos' ? 'Próximos Eventos' : 'Adicionar Novo Evento'}
           </h2>
           <button
@@ -92,7 +92,7 @@ const EventosCalendarioModal = ({ show, onClose }) => {
         </div>
 
         {/* Navegação por abas - permite alternar entre visualizar e adicionar eventos */}
-        <div className="flex border-b border-gray-700 mb-4">
+        <div className="flex justify-center border-b border-gray-700 mb-4">
           <button
             className={`py-2 px-4 ${activeTab === 'eventos' ? 'border-b-2 border-white text-white' : 'text-gray-400'}`}
             onClick={() => setActiveTab('eventos')}
@@ -117,7 +117,6 @@ const EventosCalendarioModal = ({ show, onClose }) => {
                 <div 
                   key={evento.id} 
                   className="border-2 border-white rounded-lg p-3 hover:bg-gray-700 cursor-pointer transition-colors"
-                  // TODO: Adicionar função onClick para editar ou visualizar detalhes do evento
                 >
                   {/* Linha superior: data e local */}
                   <div className="flex justify-between mb-2">
@@ -128,8 +127,12 @@ const EventosCalendarioModal = ({ show, onClose }) => {
                   {/* Nome/título do evento */}
                   <p className="text-white">{evento.titulo}</p>
                   
-                  {/* Linha inferior: contratante */}
-                  <p className="text-gray-300 text-sm mt-1">Contratante: {evento.contratante}</p>
+                  {/* Linha inferior: contratante e horario */}
+                  <div className="flex justify-between mt-2">
+                    <p className="text-gray-300 text-sm mt-1">Contratante: {evento.contratante}</p>
+                    <p className ="text-gray-300 text-sm mt-1">Horário: {evento.horario}</p>
+                  </div>
+                  
                 </div>
               ))}
               
