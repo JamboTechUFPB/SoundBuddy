@@ -1,7 +1,12 @@
 'use client';
 import { useState } from 'react';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
-import { FormData, validateStep1, ValidationError } from './Validation';
+import { 
+  FormData, 
+  validateStep1, 
+  validateStep1Sync, 
+  ValidationError 
+} from './Validation';
 
 interface StepProps {
   formData: FormData;
@@ -19,6 +24,7 @@ const Step1 = ({ formData, setFormData, handleNextStep }: StepProps) => {
   // Estado para controlar erros e validação
   const [errors, setErrors] = useState<ValidationError[]>([]);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [isValidating, setIsValidating] = useState(false);
   
   // Array com os tipos de usuário disponíveis e suas descrições
   const userTypes = [
@@ -47,8 +53,23 @@ const Step1 = ({ formData, setFormData, handleNextStep }: StepProps) => {
       
       // Executa validação em tempo real se o campo já foi tocado
       if (touched[field]) {
-        const result = validateStep1({...formData, [field]: value});
-        setErrors(result.errors);
+        // Validação síncrona apenas para campos locais
+        const result = validateStep1Sync({...formData, [field]: value});
+        
+        // Filtra erros relacionados ao campo atual
+        const relevantErrors = result.errors.filter(err => 
+          // Para o campo atual ou campos relacionados (como confirmPassword)
+          err.field === field || 
+          (field === 'password' && err.field === 'confirmPassword')
+        );
+        
+        // Atualiza os erros, mantendo os que não são relacionados ao campo atual
+        const otherErrors = errors.filter(err => 
+          err.field !== field && 
+          !(field === 'password' && err.field === 'confirmPassword')
+        );
+        
+        setErrors([...otherErrors, ...relevantErrors]);
       }
     }
   };
@@ -56,8 +77,23 @@ const Step1 = ({ formData, setFormData, handleNextStep }: StepProps) => {
   // Função para lidar com o blur dos campos
   const handleBlur = (field: string) => {
     setTouched({...touched, [field]: true});
-    const result = validateStep1(formData);
-    setErrors(result.errors);
+    
+    // Validação síncrona para todos os campos
+    const result = validateStep1Sync(formData);
+    
+    // Filtra erros relacionados ao campo que perdeu o foco
+    const relevantErrors = result.errors.filter(err => 
+      err.field === field || 
+      (field === 'password' && err.field === 'confirmPassword')
+    );
+    
+    // Atualiza os erros, mantendo os que não são relacionados ao campo atual
+    const otherErrors = errors.filter(err => 
+      err.field !== field && 
+      !(field === 'password' && err.field === 'confirmPassword')
+    );
+    
+    setErrors([...otherErrors, ...relevantErrors]);
   };
 
   // Função para verificar se um campo tem erro
@@ -68,7 +104,7 @@ const Step1 = ({ formData, setFormData, handleNextStep }: StepProps) => {
   };
 
   // Função para tratar a submissão do formulário
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Marca todos os campos como tocados
@@ -78,13 +114,31 @@ const Step1 = ({ formData, setFormData, handleNextStep }: StepProps) => {
     });
     setTouched(allTouched);
     
-    // Valida todos os campos exceto email (que é validado pelo navegador)
-    const result = validateStep1(formData);
-    setErrors(result.errors);
+    // Desativa o botão e mostra indicador de carregamento durante a validação
+    setIsValidating(true);
     
-    // Só avança se for válido
-    if (result.isValid) {
-      handleNextStep();
+    try {
+      // Primeiro, validação síncrona básica
+      const syncResult = validateStep1Sync(formData);
+      
+      // Se a validação básica passar, verificamos o email
+      if (syncResult.isValid) {
+        // Agora validamos incluindo verificação de email no backend
+        const result = await validateStep1(formData, true);
+        setErrors(result.errors);
+        
+        // Só avança se for válido
+        if (result.isValid) {
+          handleNextStep();
+        }
+      } else {
+        // Se falhar na validação básica, mostramos esses erros
+        setErrors(syncResult.errors);
+      }
+    } catch (error) {
+      console.error('Erro na validação do formulário:', error);
+    } finally {
+      setIsValidating(false);
     }
   };
 
@@ -112,16 +166,20 @@ const Step1 = ({ formData, setFormData, handleNextStep }: StepProps) => {
               )}
             </div>
 
-            {/* Campo Email com validação nativa */}
+            {/* Campo Email com validação nativa + verificação de existência no submit */}
             <div>
               <input
                 type="email"
                 placeholder="Email"
                 required
-                className="input_register w-full"
+                className={`input_register w-full ${getFieldError('email') ? 'border-red-500' : ''}`}
                 value={formData.email}
                 onChange={(e) => handleChange('email', e.target.value)}
+                onBlur={() => handleBlur('email')}
               />
+              {getFieldError('email') && (
+                <p className="text-red-500 text-xs mt-1">{getFieldError('email')}</p>
+              )}
             </div>
 
             {/* Campo Senha */}
@@ -197,12 +255,22 @@ const Step1 = ({ formData, setFormData, handleNextStep }: StepProps) => {
           {/* Botão para avançar para o próximo passo */}
           <button
             type="submit"
-            className="mt-6 w-full border-2 border-white rounded-full py-3 text-white 
-                    hover:bg-white hover:text-black transition-colors flex items-center 
-                    justify-center gap-2 text-sm"
+            disabled={isValidating}
+            className={`mt-6 w-full border-2 border-white rounded-full py-3 text-white 
+                      hover:bg-white hover:text-black transition-colors flex items-center 
+                      justify-center gap-2 text-sm ${isValidating ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            Continuar
-            <ArrowRightIcon className="h-4 w-4" />
+            {isValidating ? (
+              <>
+                Verificando...
+                {/* Você pode adicionar um spinner/loader aqui */}
+              </>
+            ) : (
+              <>
+                Continuar
+                <ArrowRightIcon className="h-4 w-4" />
+              </>
+            )}
           </button>
         </form>
       </div>

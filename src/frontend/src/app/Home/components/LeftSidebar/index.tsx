@@ -171,10 +171,10 @@ const LeftSidebar = () => {
 
         {/* Área fixa de rodapé com botões de ação */}
         <div className="border-t text-white border-gray-700 pt-4 space-y-2 p-5">
-          <button className="w-full rounded-full bg-gray-800 hover:bg-gray-700 p-1 text-sm transition-colors">
+          {/*<button className="w-full rounded-full bg-gray-800 hover:bg-gray-700 p-1 text-sm transition-colors">
             Configurações
-            {/* TODO: Implementar navegação para página de configurações */}
-          </button>
+             TODO: Implementar navegação para página de configurações 
+          </button>*/}
           <button 
           onClick={handleLogout}
           className="w-full rounded-full bg-red-600 hover:bg-red-400 p-1 text-sm transition-colors">
