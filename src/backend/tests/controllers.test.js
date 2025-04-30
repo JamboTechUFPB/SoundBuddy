@@ -1,15 +1,21 @@
-import { userController } from 'controllers/userController.js';
-import userModel from "../../models/userModel.js";
-import { generateAccessToken, generateRefreshToken } from "middlewares/authMiddleware.js";
-import bcrypt from 'bcrypt';
-import httpMocks from 'node-mocks-http';
-import dotenv from 'dotenv';
+const { userController } = require('../controllers/userController.js');
+const userModel = require('../models/userModel.js');
+const { generateAccessToken, generateRefreshToken } = require('../middlewares/authMiddleware.js');
+const bcrypt = require('bcrypt');
+const httpMocks = require('node-mocks-http');
+const dotenv = require('dotenv');
 
 dotenv.config();
 
-jest.mock("models/userModel.js");
+jest.mock('../models/userModel.js');
 jest.mock('bcrypt');
-jest.mock("middlewares/authMiddleware.js");
+jest.mock('../middlewares/authMiddleware.js');
+
+dotenv.config();
+
+jest.mock("../models/userModel.js");
+jest.mock('bcrypt');
+jest.mock("../middlewares/authMiddleware.js");
 
 describe('userController.createUser', () => {
   beforeEach(() => {
