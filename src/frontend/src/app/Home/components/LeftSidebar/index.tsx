@@ -5,7 +5,7 @@ import ContratacoesModal from './ContratacoesModal';
 import SeguidoresModal from '@/app/components/SeguidoresModal';
 import PostsSalvosModal from './PostsSalvosModal';
 import { StarIcon } from '@heroicons/react/24/solid';
-
+import { userService } from '@/app/services/api';
 /**
  * Componente LeftSidebar
  * 
@@ -25,23 +25,35 @@ const LeftSidebar = () => {
     subtipo: null // usado para diferenciar 'seguidores' e 'seguindo'
   });
 
-  // TODO: Integrar com API de perfil do usuário
-  // Dados mockados do perfil - devem ser carregados do backend
-  const profileData = {
-    image: 'https://i.pravatar.cc/150?img=8',
-    username: 'joansilva',
-    followers: '2.345',
-    following: '1.234',
-    rating: 4.7 // Nota do perfil (de 0 a 5)
-  };
-
-  // TODO: Carregar as tags do perfil do usuário do backend
-  // Tags de gêneros musicais 
-  const Tags = [
-    'Jazz', 'MPB', 'NeoBossa',
-    'Indie', 'Folk', 'R&B'
-  ];
-
+  const [profileData, setProfileData] = useState({
+    username: '',
+    image: '',
+    followers: '0',
+    following: '0',
+    rating: '0.0',
+    tags: []
+  });
+  
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await userService.getProfile();
+        setProfileData({
+          username: data.name,
+          image: data.profileImage,
+          followers: data.followers || '12345',
+          following: data.following || '6789',
+          rating: data.rating || '4.7',
+          tags: data.tags || []
+        });
+      } catch (error) {
+        console.error('Erro ao carregar perfil:', error);
+      }
+    };
+  
+    fetchProfile();
+  }, []);
+  
   /**
    * controlar o comportamento responsivo da sidebar
    * - Em telas menores que 1200px, colapsa automaticamente
@@ -65,9 +77,13 @@ const LeftSidebar = () => {
    * Função para realizar logout
    * TODO: Implementar integração com API de autenticação
    */
-  const handleLogout = () => {
-    // TODO: Adicionar chamada para API de logout
-    router.push('/');
+  const handleLogout = async () => {
+    try {
+      await userService.logout();
+      router.push('/Login');
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
   };
 
   // Navega para a página de perfil do usuário
@@ -97,11 +113,17 @@ const LeftSidebar = () => {
         <div className="flex-1 overflow-y-auto scrollbar-right p-5">
           {/* Seção de perfil do usuário */}
           <div className="text-center mb-6">
-            <img 
-              src={profileData.image} 
-              alt="Foto de perfil"
-              className="w-20 h-20 rounded-full mx-auto mb-1 object-cover"
-            />
+            {profileData.image ? (
+              <img 
+                src={profileData.image} 
+                alt="Foto de perfil"
+                className="w-20 h-20 rounded-full mx-auto mb-1 object-cover"
+              />
+            ) : (
+              <div className="w-20 h-20 rounded-full mx-auto mb-1 bg-gray-700 flex items-center justify-center">
+                <span className="text-gray-400 text-2xl">?</span>
+              </div>
+            )}
             <span onClick={handleProfileClick} className="text-lg font-medium mb-4 truncate text-white cursor-pointer">
               @{profileData.username}</span> 
             
@@ -133,7 +155,7 @@ const LeftSidebar = () => {
           {/* Tags/gêneros musicais do artista */}
           <div className="mb-4">
             <div className="grid grid-cols-3 gap-2 text-white">
-              {Tags.map((tag, index) => (
+              {profileData.tags.map((tag, index) => (
                 <span 
                   key={index}
                   className="px-3 py-1 bg-gray-800 rounded-full text-xs text-center truncate"

@@ -10,6 +10,7 @@ router.post('/login', userController.loginUser);
 router.post('/logout', authenticateToken, userController.logoutUser);
 router.get('/refresh-token', authenticateToken, userController.refreshToken);
 router.get('/user', authenticateToken, userController.getUserInfo);
+router.get('/users/profile', authenticateToken, userController.getUserProfileBasicInfo);
 
 export default router;
 

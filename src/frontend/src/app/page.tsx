@@ -1,5 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 /**
  * Componente Landing
@@ -14,6 +15,17 @@ export default function Landing() {
   // Inicializa o hook de navegação do Next.js para permitir redirecionamentos
   const router = useRouter();
 
+
+  // Se o usuário estiver autenticado, redireciona para Home
+  useEffect(() => {
+    // Verifica se existe um token de acesso
+    const accessToken = localStorage.getItem('accessToken');
+    
+    // Se o usuário estiver autenticado, redireciona para Home
+    if (accessToken) {
+      router.push('/Home');
+    }
+  }, [router]);
   /**
    * Redireciona o usuário para a página de login
    */

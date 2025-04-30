@@ -224,4 +224,16 @@ export const userController = {
       res.status(500).json({ message: error.message });
     }
   },
+  async getUserProfileBasicInfo(req, res){
+    try {
+      const userId = req.user.id? req.user.id : req.user._id;
+      const user = await userModel.findById(userId).select('name email profileImage userType tags');
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      res.status(200).json(user);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
 }

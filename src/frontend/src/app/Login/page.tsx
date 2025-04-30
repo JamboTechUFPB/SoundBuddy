@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/navigation'; // Importando o hook de roteamento do Next.js
 import { useState } from 'react'; // Importação do useState para gerenciar o estado do formulário
+import { userService } from '@/app/services/api'; // Importando o serviço de usuário para autenticação
+import { useEffect } from 'react'; // Importando o useEffect para efeitos colaterais
 
 /**
  * Componente de Login da aplicação SoundBuddy
@@ -11,6 +13,16 @@ import { useState } from 'react'; // Importação do useState para gerenciar o e
 export default function Login() {
   // Hook para navegação entre páginas
   const router = useRouter();
+
+  useEffect(() => {
+    // Verifica se existe um token de acesso
+    const accessToken = localStorage.getItem('accessToken');
+    
+    // Se o usuário já estiver autenticado, redireciona para Home
+    if (accessToken) {
+      router.push('/Home');
+    }
+  }, [router]);
   
   // Estados para controlar inputs e modal de recuperação de senha
   const [email, setEmail] = useState('');
@@ -50,12 +62,8 @@ export default function Login() {
    * @param {React.FormEvent} e - Evento de formulário
    */
   const handleSubmit = async (e: any) => {
-    // 1. Autenticação real com API
     e.preventDefault();
-    console.log('Login submitted:', { email, password });
     
-
-    // 2. Adicionar tratamento de erros de autenticação
     // Marca todos os campos como tocados para validação
     setTouched({
       email: true,
@@ -68,32 +76,10 @@ export default function Login() {
     }
     
     try {
-      const response = await fetch('http://localhost:8000/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ email, password }),
-      });
-  
-      if (!response.ok) {
-        setAuthError('Email ou senha incorretos. Por favor, tente novamente.');
-        return;
-      }
-  
-      const data = await response.json();
-      
-      // Salva tokens
-      // 3. armazenamento de token de sessão
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
-  
-      // Redireciona
+      await userService.login(email, password);
       router.push('/Home');
-  
     } catch (error) {
-      setAuthError('Erro ao fazer login. Verifique sua conexão e tente novamente.');
+      setAuthError('Email ou senha incorretos. Por favor, tente novamente.');
       console.error(error);
     }
   };
