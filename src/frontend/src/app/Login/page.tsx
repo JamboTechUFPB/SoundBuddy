@@ -19,25 +19,88 @@ export default function Login() {
   const [recoveryEmail, setRecoveryEmail] = useState('');
   const [isRecoverySubmitted, setIsRecoverySubmitted] = useState(false);
   
+  // Estados para controle de erro de autenticação
+  const [authError, setAuthError] = useState('');
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  
+  // Função para lidar com mudanças nos campos
+  const handleChange = (field: string, value: string) => {
+    if (field === 'email') {
+      setEmail(value);
+    } else if (field === 'password') {
+      setPassword(value);
+    }
+    
+    // Marca o campo como tocado
+    setTouched({...touched, [field]: true});
+    
+    // Limpa mensagem de erro de autenticação quando o usuário começa a digitar novamente
+    if (authError) {
+      setAuthError('');
+    }
+  };
+  
+  // Função para lidar com o blur dos campos
+  const handleBlur = (field: string) => {
+    setTouched({...touched, [field]: true});
+  };
+  
   /**
-   * Lida com o envio do formulário de login
-   * @param {Event} e - Evento de formulário
+   * Lida com o envio do formulário de login fazendo uma chamada à API
+   * @param {React.FormEvent} e - Evento de formulário
    */
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e: any) => {
+    // 1. Autenticação real com API
     e.preventDefault();
+    console.log('Login submitted:', { email, password });
     
+
+    // 2. Adicionar tratamento de erros de autenticação
+    // Marca todos os campos como tocados para validação
+    setTouched({
+      email: true,
+      password: true
+    });
     
-    // TODO: Implementar autenticação real com API/backend
-    // TODO: Adicionar tratamento de erros de autenticação
-    // TODO: Implementar armazenamento de token de sessão
+    // Verifica se os campos necessários estão preenchidos
+    if (!email || !password) {
+      return;
+    }
     
-    // Navega para a página inicial após "login" bem-sucedido
-    router.push('/Home');
+    try {
+      const response = await fetch('http://localhost:8000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ email, password }),
+      });
+  
+      if (!response.ok) {
+        setAuthError('Email ou senha incorretos. Por favor, tente novamente.');
+        return;
+      }
+  
+      const data = await response.json();
+      
+      // Salva tokens
+      // 3. armazenamento de token de sessão
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
+  
+      // Redireciona
+      router.push('/Home');
+  
+    } catch (error) {
+      setAuthError('Erro ao fazer login. Verifique sua conexão e tente novamente.');
+      console.error(error);
+    }
   };
   
   /**
    * Lida com o envio do formulário de recuperação de senha
-   * @param {Event} e - Evento de formulário
+   * @param {React.FormEvent} e - Evento de formulário
    */
   const handlePasswordRecovery = (e) => {
     e.preventDefault();
@@ -58,41 +121,58 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-black md:bg-gray-100 p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-zinc-900 via-gray-700 to-zinc-800 p-4">
       {/* Título SoundBuddy */}
-      <h1 className="text-3xl md:text-5xl font-bold text-white md:text-black mb-6 md:mb-10">
-        SoundBuddy
+      <div className="absolute inset-0 bg-zinc-900/10 backdrop-blur-3xl" />
+
+      <h1 className="text-3xl md:text-5xl font-bold text-white md:text-zinc-100 mb-6 md:mb-10 z-10">
+        Soundbuddy
       </h1>
       
       {/* Container do Login */}
-      <div className="w-full md:w-100 p-6 bg-black shadow-lg rounded-xl md:rounded-3xl">
+      <div className="w-full md:w-100 p-6 bg-black/30 shadow-2xl shadow-white/20 rounded-xl md:rounded-3xl z-10">
         <h2 className="text-xl md:text-2xl text-white font-bold mb-4 text-center">
           Login
         </h2>
+        
+        {/* Mensagem de erro de autenticação */}
+        {authError && (
+          <div className="mb-4 p-3 border border-red-500 bg-red-500/10 text-red-500 rounded-lg text-sm">
+            {authError}
+          </div>
+        )}
+        
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-white mb-2">Email</label>
             <input
               type="email"
-              className="input_register w-full md:w-auto"
+              className={`input_register w-full md:w-auto ${touched.email && !email ? 'border-red-500' : ''}`}
               placeholder="Digite seu email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => handleChange('email', e.target.value)}
+              onBlur={() => handleBlur('email')}
               required
             />
-            {/* TODO: Adicionar validação em tempo real para o email */}
+            {touched.email && !email && (
+              <p className="text-center text-red-500 text-xs mt-1">Email é obrigatório</p>
+            )}
           </div>
-          <div className="mb-4"> {/* Modificado de mb-6 para mb-4 para acomodar o link de esqueci senha */}
+          
+          <div className="mb-4">
             <label className="block text-white mb-2">Senha</label>
             <input
               type="password"
-              className="input_register w-full md:w-auto"
+              className={`input_register w-full md:w-auto ${touched.password && !password ? 'border-red-500' : ''}`}
               placeholder="Digite sua senha"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => handleChange('password', e.target.value)}
+              onBlur={() => handleBlur('password')}
               required
             />
-
+            {touched.password && !password && (
+              <p className="text-center text-red-500 text-xs mt-1">Senha é obrigatória</p>
+            )}
             {/* TODO: Adicionar toggle para mostrar/esconder senha */}
           </div>
           
@@ -105,7 +185,6 @@ export default function Login() {
             >
               Esqueci minha senha
             </button>
-           
           </div>
           
           <div className="flex justify-center">
@@ -117,16 +196,12 @@ export default function Login() {
             >
               Entrar
             </button>
-            {/* TODO: Adicionar opção de "Manter conectado" talvez? */}
           </div>
-          
-          {/* TODO: Adicionar login com redes sociais ? */}
-        
         </form>
       </div>
       
       {/* Texto abaixo do card */}
-      <p className="mt-6 md:mt-8 text-lg md:text-xl text-white md:text-gray-700 font-medium">
+      <p className="mt-6 md:mt-8 text-lg md:text-xl text-white md:text-white font-medium z-10">
         IT'S ALL ABOUT MUSIC
       </p>
       
@@ -185,7 +260,6 @@ export default function Login() {
                     Enviar
                   </button>
                 </div>
-               
               </form>
             )}
           </div>

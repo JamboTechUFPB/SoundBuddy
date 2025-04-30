@@ -29,6 +29,49 @@ const Register = () => {
     if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
+  /*const handleSubmit = async () => {
+    try {
+      if (formData.password !== formData.confirmPassword) {
+        alert("Senhas não coincidem");
+        return;
+      }
+      console.log('Form submitted:', formData);
+  
+      const userData = {
+        name: formData.username,
+        email: formData.email,
+        password: formData.password,
+        userType: formData.userType,
+        tags: formData.tags,
+      };
+  
+      const response = await fetch('http://localhost:8000/api/users/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(userData),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao criar usuário');
+      }
+  
+      const data = await response.json();
+  
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
+
+      router.push('/Home');
+
+    } catch (error) {
+      console.error('Error during registration:', error);
+      alert('Erro ao criar conta. Tente novamente.');
+    }
+  };*/
+
+
   const handleSubmit = () => {
     // Lógica de envio do formulário
     router.push('/Home');

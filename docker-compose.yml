@@ -26,30 +26,20 @@ services:
       - "${BACK_PORT}:8000"
     environment:
       - NODE_ENV=development
-      - MONGO_URI=mongodb://localhost:${DB_PORT}/${DB_NAME}
-      - PORT=${BACK_PORT}
-      - FRONT_URL=http://localhost:${FRONT_PORT}
-      - FRONT_PORT=${FRONT_PORT}
-      - BACK_PORT=${BACK_PORT}
-      - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
-      - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
+      - MONGO_URI=mongodb://mongodb:27017/soundbuddy
     volumes:
       - ./src/backend:/app
-      - backend_node_modules:/app/node_modules
-    depends_on:
-      - mongodb
+      - /app/node_modules
+      - mongodb_data:/data/db
     networks:
       - soundbuddy-network
 
   mongodb:
-    image: mongo
-    container_name: ${DB_NAME}-mongo-container
+    image: mongo:latest
     ports:
-      - "${DB_PORT}:27017"
+      - "27017:27017"
     volumes:
-      - ./src/backend/mongo-data-docker:/data/db
-    command: mongod --logpath /dev/null --logappend --quiet
-    user: "${UID}:${GID}"
+      - mongodb_data:/data/db
     networks:
       - soundbuddy-network
 
@@ -58,5 +48,5 @@ networks:
     driver: bridge
 
 volumes:
-  backend_node_modules:
-  frontend_node_modules:
+  mongodb_data: # Updated from mongodb_data to mongo_data
+    driver: local
