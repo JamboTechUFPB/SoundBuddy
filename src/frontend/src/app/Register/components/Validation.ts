@@ -16,6 +16,7 @@ export interface FormData {
   userType: string;
   about: string;
   tags: string[];
+  profileImage: File | null; // Para o upload de imagem de perfil
   // outros campos que possam existir no formulário completo
 }
 

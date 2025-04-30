@@ -29,7 +29,6 @@ services:
       - MONGO_URI=mongodb://mongodb:27017/soundbuddy
     volumes:
       - ./src/backend:/app
-      - /app/node_modules
       - mongodb_data:/data/db
     networks:
       - soundbuddy-network

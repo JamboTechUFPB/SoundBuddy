@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import Step1 from './components/Step1';
 import Step2 from './components/Step2';
 import Step3 from './components/Step3';
-import { FormData } from './components/types';
+import type { FormData } from './components/types';
 
 const Register = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -29,29 +29,31 @@ const Register = () => {
     if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
-  /*const handleSubmit = async () => {
+  const handleSubmit = async () => {
     try {
       if (formData.password !== formData.confirmPassword) {
         alert("Senhas não coincidem");
         return;
       }
       console.log('Form submitted:', formData);
-  
-      const userData = {
-        name: formData.username,
-        email: formData.email,
-        password: formData.password,
-        userType: formData.userType,
-        tags: formData.tags,
-      };
+
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.username);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('password', formData.password);
+      formDataToSend.append('userType', formData.userType);
+      formDataToSend.append('about', formData.about);
+      formDataToSend.append('tags', JSON.stringify(formData.tags));
+
+      if (formData.profileImage) {
+        formDataToSend.append('profileImage', formData.profileImage);
+      }
+
   
       const response = await fetch('http://localhost:8000/api/users/create', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         credentials: 'include',
-        body: JSON.stringify(userData),
+        body: formDataToSend,
       });
       if (!response.ok) {
         const errorData = await response.json();
@@ -69,12 +71,6 @@ const Register = () => {
       console.error('Error during registration:', error);
       alert('Erro ao criar conta. Tente novamente.');
     }
-  };*/
-
-
-  const handleSubmit = () => {
-    // Lógica de envio do formulário
-    router.push('/Home');
   };
 
   return (

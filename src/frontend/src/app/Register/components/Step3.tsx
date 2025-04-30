@@ -1,5 +1,5 @@
 'use client';
-import { FormData, StepProps } from './types';
+import { FormData, StepProps, ProcessedImage } from './types';
 import { ArrowRightIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 /**
@@ -22,9 +22,23 @@ const Step3 = ({ formData, setFormData, handleSubmit, handlePreviousStep }: Step
    */
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFormData({...formData, profileImage: e.target.files[0]});
-      // TODO: Adicionar validação de tamanho e formato de arquivo
+      const file = e.target.files[0];
       
+      // Validação de tamanho e tipo
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Arquivo muito grande. Máximo 5MB.');
+        return;
+      }
+  
+      if (!['image/jpeg', 'image/png'].includes(file.type)) {
+        alert('Apenas imagens JPG e PNG são permitidas.');
+        return;
+      }
+  
+      setFormData(prev => ({
+        ...prev,
+        profileImage: file // Mantém apenas o preview local
+      }));
     }
   };
   

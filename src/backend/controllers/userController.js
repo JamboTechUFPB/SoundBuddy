@@ -4,6 +4,9 @@ import { generateAccessToken, generateRefreshToken } from "../middlewares/authMi
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
+import sharp from 'sharp';
+import path from 'path';
+import fs from 'fs';
 
 dotenv.config();
 
@@ -11,13 +14,22 @@ export const userController = {
 
   async createUser(req, res){
     try {
-      const name = req.body.name;
-      const email = req.body.email || null;
-      const password = req.body.password || null;
+      const { name, email, password, userType } = req.body;
+      let tags = [];
       
-      const userType = req.body.userType || null;
-      const tags = req.body.tags || [];
+      try {
+        tags = JSON.parse(req.body.tags || '[]');
+      } catch (e) {
+        console.error('Erro ao fazer parse das tags:', e);
+      }
 
+      let profileImagePath = null;
+
+      const profileImage = req.file;
+
+      if (profileImage && profileImage.size > 5 * 1024 * 1024) {
+        return res.status(400).json({ message: 'Profile image size must be less than 8mb' });
+      }
       if (!email) {
         return res.status(400).json({ message: 'Email is required' });
       }
@@ -35,10 +47,27 @@ export const userController = {
 
       let user;
       const hashedPassword = await bcrypt.hash(password, 10);
-      
-      user = new userModel({ name, email, password: hashedPassword, tags, userType });
-      await user.save();
 
+      if (profileImage) {
+        const optimizedFileName = `opt-${req.file.filename}`;
+        const optimizedPath = path.join(req.file.destination, optimizedFileName);
+
+        // Otimiza e redimensiona a imagem
+        await sharp(req.file.path)
+          .resize(400, 400, { fit: 'cover' })
+          .jpeg({ quality: 80 })
+          .toFile(optimizedPath);
+
+        // Remove o arquivo original
+        fs.unlinkSync(req.file.path);
+        
+        // Salva o caminho relativo
+        profileImagePath = `/data/uploads/${optimizedFileName}`;
+      }
+      
+      user = new userModel({ name, email, password: hashedPassword, tags, userType, profileImage: profileImagePath });
+      await user.save();
+      
       const accessToken = generateAccessToken(user);
       const refreshToken = await generateRefreshToken(user);
 

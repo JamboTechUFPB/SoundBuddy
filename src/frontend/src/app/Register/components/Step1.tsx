@@ -30,15 +30,18 @@ const Step1 = ({ formData, setFormData, handleNextStep }: StepProps) => {
   const userTypes = [
     {
       type: 'Artista',
-      description: 'Músicos, produtores ou técnicos de som que oferecem seus serviços, exibem suas habilidades e se candidatam a oportunidades de trabalho.'
+      description: 'Músicos, produtores ou técnicos de som que oferecem seus serviços, exibem suas habilidades e se candidatam a oportunidades de trabalho.',
+      modelName: 'musician'
     },
     {
       type: 'Both',
-      description: 'Contrate músicos enquanto oferece seus próprios serviços, acessando todos os recursos de ambos os tipos de conta.'
+      description: 'Contrate músicos enquanto oferece seus próprios serviços, acessando todos os recursos de ambos os tipos de conta.',
+      modelName: 'both'
     },
     {
       type: 'Contratante',
-      description: 'Indivíduos ou organizações que buscam contratar músicos ou profissionais da área musical para eventos e produções.'
+      description: 'Indivíduos ou organizações que buscam contratar músicos ou profissionais da área musical para eventos e produções.',
+      modelName: 'contractor'
     }
   ];
 
@@ -229,15 +232,15 @@ const Step1 = ({ formData, setFormData, handleNextStep }: StepProps) => {
                       type="radio"
                       name="userType"
                       className="hidden"
-                      checked={formData.userType === type.type}
-                      onChange={() => handleChange('userType', type.type)}
+                      checked={formData.userType === type.modelName}
+                      onChange={() => handleChange('userType', type.modelName)}
                     />
                     {/* Aparência visual do button */}
                     <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors
-                      ${formData.userType === type.type 
+                      ${formData.userType === type.modelName 
                         ? 'border-white bg-white' 
                         : 'border-gray-400 hover:border-white'}`}>
-                      {formData.userType === type.type && (
+                      {formData.userType === type.modelName && (
                         <div className="w-3 h-3 rounded-full bg-black"/>
                       )}
                     </div>

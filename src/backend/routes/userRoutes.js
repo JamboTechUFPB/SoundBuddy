@@ -1,10 +1,11 @@
 import express from 'express';
 import { userController } from '../controllers/userController.js';
 import { authenticateToken } from '../middlewares/authMiddleware.js';
+import { upload } from '../middlewares/multerMiddleware.js';
 
 const router = express.Router();
 
-router.post('/users/create', userController.createUser);
+router.post('/users/create', upload.single('profileImage'), userController.createUser);
 router.post('/login', userController.loginUser);
 router.post('/logout', authenticateToken, userController.logoutUser);
 router.get('/refresh-token', authenticateToken, userController.refreshToken);

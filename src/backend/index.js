@@ -20,8 +20,10 @@ app.use(cors({
   maxAge: 86400 // cache preflight por 24 horas
 }));
 
-app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use('/data/uploads', express.static('data/uploads'));
 
 const port = process.env.BACK_PORT || 8000;
 
