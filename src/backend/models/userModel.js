@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema({
     enum: ["musician", "contractor", "both"],
     default: "musician",
   },
+  about: {
+    type: String,
+    default: null,
+  },
   tags: {
     type: [String],
     default: [],
@@ -51,6 +55,11 @@ userSchema.methods.toJSON = function () {
   const userObject = this.toObject();
   delete userObject.password;
   delete userObject.refreshToken;
+  delete userObject.accessToken;
+  delete userObject.__v;
+  delete userObject.createdAt;
+  delete userObject.updatedAt;
+  delete userObject.lastLogin;
   return userObject;
 }
 

@@ -15,7 +15,7 @@ export const userController = {
 
   async createUser(req, res){
     try {
-      const { name, email, password, userType } = req.body;
+      const { name, email, password, userType, about } = req.body;
       let tags = [];
       
       try {
@@ -66,13 +66,13 @@ export const userController = {
         profileImagePath = `/data/uploads/${optimizedFileName}`;
       }
       
-      user = new userModel({ name, email, password: hashedPassword, tags, userType, profileImage: profileImagePath });
+      user = new userModel({ name, email, password: hashedPassword, tags, userType, about, profileImage: profileImagePath });
       await user.save();
       
       const accessToken = generateAccessToken(user);
       const refreshToken = await generateRefreshToken(user);
 
-      res.status(201).json({ user, accessToken, refreshToken });
+      res.status(201).json({ user: { ...user.toJSON() }, accessToken, refreshToken });
     } catch (error) {
       console.error("Error creating user: ", error);
       res.status(500).json({ message: error.message });

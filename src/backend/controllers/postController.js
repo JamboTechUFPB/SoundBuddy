@@ -114,12 +114,13 @@ export const postController = {
   async getPublicUserPosts(req, res) {
     try {
       // get public user posts from username
-      const { username } = req.query;
+      // /api/posts/:username
+      const username = req.params.username;
       if (!username) {
         return res.status(400).json({ message: "Username is required" });
       }
       const user = await UserModel.findOne({
-        username: username
+        name: username
       })
       if (!user) {
         return res.status(404).json({ message: "User not found" });

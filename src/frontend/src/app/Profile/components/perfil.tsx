@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import SeguidoresModal from '@/app/components/SeguidoresModal';
-import { EllipsisHorizontalIcon, TrashIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { EllipsisHorizontalIcon, TrashIcon, XMarkIcon, MusicalNoteIcon } from '@heroicons/react/24/outline';
 
 const ProfileMain = ({ userData, isOwnProfile }) => {
   // Lista de tags predefinidas disponíveis para seleção
@@ -11,27 +11,102 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
   // Estado para definir o tipo de lista a ser exibida no modal (seguidores ou seguindo)
   const [modalType, setModalType] = useState('');
   // Estado para controlar o processo de follow/unfollow
-  const [isFollowing, setIsFollowing] = useState(userData?.isFollowing || false);
+  const [isFollowing, setIsFollowing] = useState(userData.isFollowing);
   // Estado para indicar loading durante as requisições
   const [isLoading, setIsLoading] = useState(false);
   // Estado para edição do perfil
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  // Estado para edição da bio
-  const [bio, setBio] = useState(userData?.bio || '');
+  // Estado para edição da about
+  const [about, setAbout] = useState(userData.about);
   // Estado para armazenar os posts localmente (para permitir exclusão local)
-  const [posts, setPosts] = useState(userData?.posts || []);
+  const [posts, setPosts] = useState(userData.posts);
   // Estado para tags do usuário
-  const [selectedTags, setSelectedTags] = useState(userData?.tags || ['Jazz', 'Rock', 'Pop', 'Eletrônica']);
+  const [selectedTags, setSelectedTags] = useState(userData.tags);
+
   // Estado para mensagem de erro das tags
   const [tagError, setTagError] = useState('');
   // Ref para input de arquivo da foto de perfil
   const fileInputRef = useRef(null);
   // Estado para preview da nova foto de perfil
   const [imagePreview, setImagePreview] = useState(null);
+
+  const [enlargedImage, setEnlargedImage] = useState(null);
+  const [enlargedVideo, setEnlargedVideo] = useState(null);
+
   
   if (!userData) {
     return <div className="p-4 text-center">Carregando perfil...</div>;
   }
+
+  const renderMedia = (media: Media) => {
+    if (!media) return null;
+    if (!media.type) return null;
+
+    switch (media.type) {
+      case 'image':
+        return (
+          <div className="mt-3 mb-10 flex justify-center">
+            <div 
+              className="relative rounded-lg overflow-hidden cursor-pointer max-w-md"
+              onClick={() => setEnlargedImage(media.url)}
+            >
+              <img
+                src={media.url}
+                alt="Imagem do post"
+                className="w-full h-auto rounded-lg object-cover"
+              />
+            </div>
+          </div>
+        );
+      
+      case 'video':
+        return (
+          <div className="mt-3 mb-10 flex justify-center">
+            <div className="relative rounded-lg overflow-hidden max-w-md">
+              <video 
+                src={media.url}
+                className="w-full h-full rounded-lg"
+                controls
+                onClick={(e) => {
+                  // Previne que o clique no vídeo abra o modal se estiver clicando nos controles
+                  if (e.target === e.currentTarget) {
+                    setEnlargedVideo(media.url);
+                  }
+                }}
+              >
+                Seu navegador não suporta o elemento de vídeo.
+              </video>
+              <div 
+                className="absolute cursor-pointer"
+                onClick={() => setEnlargedVideo(media.url)}
+              ></div>
+            </div>
+          </div>
+        );
+      
+      case 'audio':
+        return (
+          <div className="mt-3 mb-10 bg-gray-100 rounded-lg p-3">
+            <div className="flex items-center mb-2">
+              <MusicalNoteIcon className="w-5 h-5 text-gray-600 mr-2" />
+              <span className="text-sm font-medium text-gray-700">
+                {media.name || "Áudio"}
+              </span>
+            </div>
+            <audio 
+              controls 
+              className="w-full"
+              src={media.url}
+            >
+              Seu navegador não suporta o elemento de áudio.
+            </audio>
+          </div>
+        );
+      
+      default:
+        return null;
+    }
+  };
 
   // Função para abrir o modal com o tipo especificado
   const openModal = (type) => {
@@ -47,7 +122,7 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
   // Função para iniciar edição do perfil
   const handleEditProfile = () => {
     setIsEditingProfile(true);
-    setBio(userData.bio || '');
+    setAbout(userData.about || '');
     setSelectedTags(userData.tags || ['Jazz', 'Rock', 'Pop', 'Eletrônica']);
     setImagePreview(null);
     setTagError('');
@@ -101,7 +176,7 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
       await new Promise(resolve => setTimeout(resolve, 800));
       
       // Atualizar os dados localmente
-      userData.bio = bio;
+      userData.about = about;
       userData.tags = selectedTags;
       
       // Se houver uma nova imagem, atualizá-la
@@ -115,7 +190,7 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
       /* 
       // Implementação real com backend
       const formData = new FormData();
-      formData.append('bio', bio);
+      formData.append('about', about);
       formData.append('tags', JSON.stringify(selectedTags));
       
       if (fileInputRef.current.files[0]) {
@@ -238,7 +313,7 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
             {isEditingProfile ? (
               <div className="relative">
                 <img
-                  src={imagePreview || userData.image}
+                  src={imagePreview || userData.profileImage}
                   alt="Foto de perfil"
                   className="w-32 h-32 rounded-full border-4 border-blue-500 object-cover"
                 />
@@ -371,14 +446,14 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
         <h2 className="text-2xl font-bold mb-4 text-gray-800">Sobre</h2>
         {isEditingProfile && isOwnProfile ? (
           <textarea
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-32"
+            value={about}
+            onChange={(e) => setAbout(e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none overflow-y-auto whitespace-pre-wrap break-words min-h-[8rem]"
             placeholder="Escreva algo sobre você..."
           />
         ) : (
           <p className="text-gray-600 whitespace-pre-line leading-relaxed">
-            {userData.bio || 'Nenhuma informação disponível.'}
+            {userData.about || 'Nenhuma informação disponível.'}
           </p>
         )}
       </div>
@@ -393,15 +468,15 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
               <div key={post.id} className="border-b border-gray-100 pb-6 last:border-b-0">
                 <div className="flex items-start gap-4">
                   <img 
-                    src={post.authorImage || userData.image} 
+                    src={post.user.profileImage || userData.profileImage} 
                     className="w-12 h-12 rounded-full object-cover"
                     alt="Autor"
                   />
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-3">
-                        <span className="font-semibold text-gray-800">{post.author}</span>
-                        <span className="text-gray-400 text-sm">{post.date}</span>
+                        <span className="font-semibold text-gray-800">{post.user.name}</span>
+                        <span className="text-gray-400 text-sm">{post.createdAt}</span>
                       </div>
                       
                       {/* Opções de post para o próprio usuário - Apenas excluir */}
@@ -428,13 +503,7 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
                     
                     <p className="text-gray-600 mb-3">{post.content}</p>
                     
-                    {post.media && (
-                      <div className="bg-gray-100 rounded-lg p-2">
-                        <div className="aspect-video bg-gray-200 rounded-md flex items-center justify-center">
-                          <span className="text-gray-500">Mídia</span>
-                        </div>
-                      </div>
-                    )}
+                    {post.media && renderMedia(post.media)}
                   </div>
                 </div>
               </div>
@@ -453,6 +522,52 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
         userId={userData.id}
         username={userData.username}
       />
+
+      {/* Modais de visualização de mídia */}
+      {enlargedImage && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setEnlargedImage(null)}
+        >
+          <div className="max-w-4xl max-h-[90vh] relative">
+            <img 
+              src={enlargedImage} 
+              alt="Imagem ampliada" 
+              className="max-w-full max-h-full object-contain"
+            />
+            <button 
+              className="absolute top-4 right-4 bg-black/50 text-white p-2 rounded-full hover:bg-black/70"
+              onClick={() => setEnlargedImage(null)}
+            >
+              X
+            </button>
+          </div>
+        </div>
+      )}
+
+      {enlargedVideo && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+          onClick={() => setEnlargedVideo(null)}
+        >
+          <div className="max-w-4xl max-h-[90vh] relative">
+            <video 
+              src={enlargedVideo} 
+              className="max-w-full max-h-full object-contain"
+              controls
+              autoPlay
+            >
+              Seu navegador não suporta o elemento de vídeo.
+            </video>
+            <button 
+              className="absolute top-4 right-4 bg-black/50 text-white p-2 rounded-full hover:bg-black/70"
+              onClick={() => setEnlargedVideo(null)}
+            >
+              X
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

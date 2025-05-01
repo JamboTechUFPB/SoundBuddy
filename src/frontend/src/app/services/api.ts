@@ -31,11 +31,40 @@ export const userService = {
       if (!response.ok) throw new Error('Falha ao buscar perfil público');
       
       const data = await response.json();
+      console.log('Dados do perfil público:', data);
+
+      // try to parse tags as array
+      if (typeof data.tags === 'string') {
+        try {
+          data.tags = JSON.parse(data.tags);
+        } catch (error) {
+          console.error('Erro ao analisar tags:', error);
+          data.tags = [];
+        }
+      }
       
       // Modifica a URL da imagem para incluir a URL base do backend
       if (data.profileImage && !data.profileImage.startsWith('http')) {
         data.profileImage = `${MEDIA_URL}${data.profileImage}`;
       }
+
+      // get posts from user
+      const postsResponse = await fetch(createRequest(`/posts/${username}`));
+      if (!postsResponse.ok) throw new Error('Falha ao buscar posts do usuário');
+      const postsData = await postsResponse.json();
+      // Modifica a URL da imagem para incluir a URL base do backend
+      postsData.posts = postsData.posts.map((post: IPost) => {
+        if (post.media && post.media.url) {
+          post.media.url = `${MEDIA_URL}${post.media.url}`;
+        }
+        if (post.user && post.user.profileImage && !post.user.profileImage.startsWith('http')) {
+          post.user.profileImage = `${MEDIA_URL}${post.user.profileImage}`;
+        }
+        return post;
+      });
+      data.posts = postsData.posts;
+      data.totalPages = postsData.totalPages;
+      data.currentPage = postsData.currentPage;
       
       return data;
     } catch (error) {

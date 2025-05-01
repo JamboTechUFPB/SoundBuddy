@@ -17,9 +17,11 @@ const ProfilePage = () => {
   const [profileData, setProfileData] = useState<ProfileData>({
     username: '',
     image: '',
-    bio: '',
+    about: '',
     followers: 0,
     following: 0,
+    tags: [],
+    rating: 0,
     posts: [],
     events: [],
     hires: [],
@@ -47,9 +49,11 @@ const ProfilePage = () => {
         setProfileData({
           username: data.name || username,
           image: data.profileImage || 'https://i.pravatar.cc/150?img=1',
-          bio: data.about || 'Artista e compositor apaixonado por música.',
+          about: data.about || 'Artista e compositor apaixonado por música.',
           followers: data.followers || '12345',
           following: data.following || '6789',
+          tags: data.tags || [],
+          rating: data.rating || '4.7',
           posts: data.posts || [],
           events: data.events || [],
           hires: data.hires || [],
@@ -59,6 +63,9 @@ const ProfilePage = () => {
         // Verificar se é o próprio perfil
         const basicInfo = await userService.getBasicInfo();
         setIsOwnProfile(basicInfo.username === username);
+        console.log('Basic Info:', basicInfo);
+        console.log('Profile Data:', data);
+        console.log('Is Own Profile:', isOwnProfile);
       } catch (error) {
         console.error('Erro ao carregar perfil:', error);
       } finally {
@@ -160,15 +167,14 @@ const ProfilePage = () => {
   };
 
   // seta os dados mockados restantes caso os dados da API ainda estejam []
-  if (profileData.posts.length === 0) {
-    setProfileData(prev => ({
-      ...prev,
-      posts: mockData.posts,
-      events: mockData.events,
-      hires: mockData.hires,
-      savedItems: mockData.savedItems
-    }));
-  }
+  //if (profileData.events.length === 0) {
+  //  setProfileData(prev => ({
+  //    ...prev,
+  //    events: mockData.events,
+  //    hires: mockData.hires,
+  //    savedItems: mockData.savedItems
+  //  }));
+  //}
 
   // Classe para ajustar o conteúdo principal quando a sidebar está presente
   const mainClass = isOwnProfile ? 
@@ -199,7 +205,18 @@ const ProfilePage = () => {
         {/* Conteúdo principal ajustável */}
         <main className={mainClass}>
           <div className="container mx-auto">
-            <ProfileMain userData={profileData} isOwnProfile={isOwnProfile}/>
+            {
+              loading ? (
+                <div className="flex items-center justify-center h-screen">
+                  <div className="loader"></div>
+                </div>
+              ) : (
+                <ProfileMain
+                userData={profileData}
+                isOwnProfile={isOwnProfile}
+                />
+              )
+            }
           </div>
         </main>
       </div>

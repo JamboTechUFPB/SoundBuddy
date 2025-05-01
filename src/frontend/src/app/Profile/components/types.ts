@@ -25,9 +25,11 @@ export interface SavedItem {
 export interface ProfileData {
   username: string;
   image: string;
-  bio: string;
+  about: string;
   followers: number;
   following: number;
+  rating: number;
+  tags: string[];
   posts: Post[];
   events: Event[];
   hires: Hire[];
