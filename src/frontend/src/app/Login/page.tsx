@@ -176,13 +176,20 @@ export default function Login() {
           </div>
           
           {/* Link de "Esqueci minha senha" */}
-          <div className="mb-6 text-center">
+          <div className="mb-6 text-center flex flex-col items-center">
             <button
               type="button"
               onClick={() => setShowForgotPassword(true)}
               className="text-sm text-gray-400 hover:text-white transition-colors"
             >
               Esqueci minha senha
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push('/Register')}
+              className="text-sm text-gray-400 hover:text-white transition-colors"
+            >
+             Cadastre-se
             </button>
           </div>
           
