@@ -6,6 +6,19 @@ import ProfileMain from '../components/perfil';
 import { userService } from '@/app/services/api';
 import type { ProfileData } from '../components/types';
 
+const isProfileDataComplete = (data: ProfileData): boolean => {
+  return !!(
+    data.username &&
+    data.profileImage &&
+    data.about &&
+    Array.isArray(data.tags) &&
+    Array.isArray(data.posts) &&
+    Array.isArray(data.events) &&
+    Array.isArray(data.hires) &&
+    Array.isArray(data.savedItems)
+  );
+};
+
 const ProfilePage = () => {
   const params = useParams();
   const username = params?.username as string;
@@ -16,7 +29,7 @@ const ProfilePage = () => {
 
   const [profileData, setProfileData] = useState<ProfileData>({
     username: '',
-    image: '',
+    profileImage: '',
     about: '',
     followers: 0,
     following: 0,
@@ -46,9 +59,11 @@ const ProfilePage = () => {
       try {
         setLoading(true);
         const data = await userService.getPublicProfile(username as string);
+        const ownBasicInfo = await userService.getBasicInfo();
+
         setProfileData({
           username: data.name || username,
-          image: data.profileImage || 'https://i.pravatar.cc/150?img=1',
+          profileImage: data.profileImage || 'https://i.pravatar.cc/150?img=1',
           about: data.about || 'Artista e compositor apaixonado por música.',
           followers: data.followers || '12345',
           following: data.following || '6789',
@@ -60,10 +75,9 @@ const ProfilePage = () => {
           savedItems: data.savedItems || []
         });
         
-        // Verificar se é o próprio perfil
-        const basicInfo = await userService.getBasicInfo();
-        setIsOwnProfile(basicInfo.username === username);
-        console.log('Basic Info:', basicInfo);
+        
+        setIsOwnProfile(ownBasicInfo.username === username);
+        console.log('Basic Info:', ownBasicInfo);
         console.log('Profile Data:', data);
         console.log('Is Own Profile:', isOwnProfile);
       } catch (error) {
@@ -206,7 +220,7 @@ const ProfilePage = () => {
         <main className={mainClass}>
           <div className="container mx-auto">
             {
-              loading ? (
+              loading || !isProfileDataComplete(profileData) ? (
                 <div className="flex items-center justify-center h-screen">
                   <div className="loader"></div>
                 </div>

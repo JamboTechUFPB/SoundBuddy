@@ -24,7 +24,7 @@ export interface SavedItem {
 
 export interface ProfileData {
   username: string;
-  image: string;
+  profileImage: string;
   about: string;
   followers: number;
   following: number;

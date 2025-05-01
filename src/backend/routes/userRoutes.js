@@ -12,6 +12,7 @@ router.get('/refresh-token', authenticateToken, userController.refreshToken);
 //router.get('/user', authenticateToken, userController.getUserInfo);
 router.get('/user', authenticateToken, userController.getUserProfileBasicInfo);
 router.get('/users/:name', userController.getUserPublicProfileInfo);
+router.put('/users/update', authenticateToken, uploadProfileImage.single('profileImage'), userController.updateUserProfileBasicInfo);
 
 export default router;
 

@@ -29,7 +29,7 @@ export const userController = {
       const profileImage = req.file;
 
       if (profileImage && profileImage.size > 5 * 1024 * 1024) {
-        return res.status(400).json({ message: 'Profile image size must be less than 8mb' });
+        return res.status(400).json({ message: 'Profile image size must be less than 5mb' });
       }
       if (!email) {
         return res.status(400).json({ message: 'Email is required' });
@@ -249,5 +249,125 @@ export const userController = {
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
-  }
+  },
+  async updateUserProfileBasicInfo(req, res){
+    try {
+      // update profileimage, tags, about
+      const userId = req.user.id? req.user.id : req.user._id;
+      const { about } = req.body;
+      let tags = [];
+      try {
+        tags = JSON.parse(req.body.tags || '[]');
+      } catch (e) {
+        console.error('Erro ao fazer parse das tags:', e);
+      }
+      let profileImagePath = null;
+      const profileImage = req.file;
+      if (profileImage && profileImage.size > 5 * 1024 * 1024) {
+        return res.status(400).json({ message: 'Profile image size must be less than 5mb' });
+      }
+
+      // update user
+      const user = await userModel.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      user.about = about;
+      user.tags = tags;
+      if (profileImage) {
+        const optimizedFileName = `opt-${req.file.filename}`;
+        const optimizedPath = path.join(req.file.destination, optimizedFileName);
+
+        // Otimiza e redimensiona a imagem
+        await sharp(req.file.path)
+          .resize(400, 400, { fit: 'cover' })
+          .jpeg({ quality: 80 })
+          .toFile(optimizedPath);
+
+        // Remove o arquivo original
+        fs.unlinkSync(req.file.path);
+        
+        // Salva o caminho relativo
+        profileImagePath = `/data/uploads/${optimizedFileName}`;
+        
+        // Atualiza o caminho da imagem no banco de dados
+        user.profileImage = profileImagePath;
+      }
+      await user.save();
+      res.status(200).json({
+        user: { ...user.toJSON() },
+        message: 'User updated successfully'
+      })
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+  async updateUser(req, res){
+    try {
+      const userId = req.user.id? req.user.id : req.user._id;
+      const { name, email, password, userType, about } = req.body;
+      let tags = [];
+      
+      try {
+        tags = JSON.parse(req.body.tags || '[]');
+      } catch (e) {
+        console.error('Erro ao fazer parse das tags:', e);
+      }
+
+      let profileImagePath = null;
+
+      const profileImage = req.file;
+
+      if (profileImage && profileImage.size > 5 * 1024 * 1024) {
+        return res.status(400).json({ message: 'Profile image size must be less than 8mb' });
+      }
+      
+      // check if user already exists by email
+      const existingUser = await userModel.findOne({ email });
+      if (existingUser && existingUser._id.toString() !== userId) {
+        return res.status(400).json({ message: 'Email already in use' });
+      }
+
+      let user;
+      
+      if (password) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        user = await userModel.findByIdAndUpdate(userId, { name, email, password: hashedPassword, tags, userType, about }, { new: true });
+      } else {
+        user = await userModel.findByIdAndUpdate(userId, { name, email, tags, userType, about }, { new: true });
+      }
+
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      if (profileImage) {
+        const optimizedFileName = `opt-${req.file.filename}`;
+        const optimizedPath = path.join(req.file.destination, optimizedFileName);
+
+        // Otimiza e redimensiona a imagem
+        await sharp(req.file.path)
+          .resize(400, 400, { fit: 'cover' })
+          .jpeg({ quality: 80 })
+          .toFile(optimizedPath);
+
+        // Remove o arquivo original
+        fs.unlinkSync(req.file.path);
+        
+        // Salva o caminho relativo
+        profileImagePath = `/data/uploads/${optimizedFileName}`;
+        
+        // Atualiza o caminho da imagem no banco de dados
+        user.profileImage = profileImagePath;
+        await user.save();
+      }
+      
+      res.status(200).json({ 
+        user: { ...user.toJSON() },
+        message: 'User updated successfully'
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },  
 }

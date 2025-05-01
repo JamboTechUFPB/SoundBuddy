@@ -171,6 +171,36 @@ export const userService = {
       throw error;
     }
   },
+  updateProfile: async (formData: FormData) => {
+    try {
+      const response = await fetch(`${BASE_URL}/users/update`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao atualizar perfil');
+      }
+
+      const data = await response.json();
+      const userData = data.user;
+      
+      // Modifica a URL da imagem para incluir a URL base do backend
+      if (userData.profileImage && !userData.profileImage.startsWith('http')) {
+        userData.profileImage = `${MEDIA_URL}${userData.profileImage}`;
+      }
+      
+      return userData;
+    } catch (error) {
+      console.error('Erro ao atualizar perfil:', error);
+      throw error;
+    }
+  }
 };
 
 export const postService = {

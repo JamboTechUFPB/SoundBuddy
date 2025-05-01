@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import SeguidoresModal from '@/app/components/SeguidoresModal';
 import { EllipsisHorizontalIcon, TrashIcon, XMarkIcon, MusicalNoteIcon } from '@heroicons/react/24/outline';
+import { userService } from '@/app/services/api';
 
 const ProfileMain = ({ userData, isOwnProfile }) => {
   // Lista de tags predefinidas disponíveis para seleção
@@ -17,18 +18,20 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
   // Estado para edição do perfil
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   // Estado para edição da about
-  const [about, setAbout] = useState(userData.about);
+  const [about, setAbout] = useState(userData?.about || '');
   // Estado para armazenar os posts localmente (para permitir exclusão local)
-  const [posts, setPosts] = useState(userData.posts);
+  const [posts, setPosts] = useState(userData?.posts || []);
   // Estado para tags do usuário
-  const [selectedTags, setSelectedTags] = useState(userData.tags);
+  const [selectedTags, setSelectedTags] = useState(userData?.tags || []);
+
+  const [localUserData, setLocalUserData] = useState(userData);
 
   // Estado para mensagem de erro das tags
   const [tagError, setTagError] = useState('');
   // Ref para input de arquivo da foto de perfil
   const fileInputRef = useRef(null);
   // Estado para preview da nova foto de perfil
-  const [imagePreview, setImagePreview] = useState(null);
+  const [imagePreview, setImagePreview] = useState(userData?.profileImage || '');
 
   const [enlargedImage, setEnlargedImage] = useState(null);
   const [enlargedVideo, setEnlargedVideo] = useState(null);
@@ -122,9 +125,9 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
   // Função para iniciar edição do perfil
   const handleEditProfile = () => {
     setIsEditingProfile(true);
-    setAbout(userData.about || '');
-    setSelectedTags(userData.tags || ['Jazz', 'Rock', 'Pop', 'Eletrônica']);
-    setImagePreview(null);
+    setAbout(userData?.about || '');
+    setSelectedTags(userData?.tags || []);
+    setImagePreview(userData?.profileImage || '');
     setTagError('');
   };
 
@@ -172,53 +175,57 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
     setIsLoading(true);
     
     try {
-      // Simular uma requisição bem-sucedida
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Atualizar os dados localmente
-      userData.about = about;
-      userData.tags = selectedTags;
-      
-      // Se houver uma nova imagem, atualizá-la
-      if (imagePreview) {
-        userData.image = imagePreview;
-      }
-      
-      // Finalizar edição
-      setIsEditingProfile(false);
-      
-      /* 
-      // Implementação real com backend
       const formData = new FormData();
       formData.append('about', about);
       formData.append('tags', JSON.stringify(selectedTags));
       
-      if (fileInputRef.current.files[0]) {
+      if (fileInputRef.current?.files?.[0]) {
         formData.append('profileImage', fileInputRef.current.files[0]);
       }
+
+      const updatedUser = await userService.updateProfile(formData);
+
+      if (!updatedUser) {
+        throw new Error('Erro ao atualizar perfil');
+      }
+      // Atualizar os dados localmente
+      userData.about = updatedUser.about;
+      // parse user tags
+      if (typeof updatedUser.tags === 'string') {
+        userData.tags = JSON.parse(updatedUser.tags);
+      } else {
+        userData.tags = updatedUser.tags;
+      }
+      userData.profileImage = updatedUser.profileImage;
       
-      const response = await fetch(`/api/users/${userData.id}`, {
-        method: 'PUT',
-        body: formData,
-      });
-      
-      if (!response.ok) throw new Error('Falha ao atualizar perfil');
-      
-      const updatedUser = await response.json();
-      // Atualizar o estado global ou revalidar a página
-      */
+      // Finalizar edição
+      setImagePreview(userData.profileImage);
+      setSelectedTags(userData.tags);
+      setAbout(userData.about);
+      setIsLoading(false);
+      setIsEditingProfile(false);
+
+      alert('Perfil atualizado com sucesso!');
     } catch (error) {
       console.error('Erro ao atualizar perfil:', error);
-      // Mostrar uma notificação de erro
-    } finally {
+      alert('Erro ao atualizar perfil. Tente novamente mais tarde.');
       setIsLoading(false);
+      setIsEditingProfile(false);
+      setImagePreview(userData.profileImage);
+      setSelectedTags(userData.tags);
+      setAbout(userData.about);
+      setTagError('');
     }
   };
 
   // Função para cancelar edição do perfil
   const handleCancelEdit = () => {
     setIsEditingProfile(false);
-    setImagePreview(null);
+    setImagePreview(userData?.profileImage || '');
+    setSelectedTags(userData?.tags || []);
+    setAbout(userData?.about || '');
+    setIsLoading(false);
+    // Limpar erro de tag
     setTagError('');
   };
 
@@ -226,11 +233,18 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+      // Verificar tipo e tamanho do arquivo
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Arquivo muito grande. Máximo 5MB.');
+        return;
+      }
+      if (!['image/jpeg', 'image/png'].includes(file.type)) {
+        alert('Apenas imagens JPG e PNG são permitidas.');
+        return;
+      }
+      
+      // Atualizar preview da imagem
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
@@ -318,7 +332,7 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
                   className="w-32 h-32 rounded-full border-4 border-blue-500 object-cover"
                 />
                 <div 
-                  className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full cursor-pointer"
+                  className="absolute inset-0 flex items-center justify-center bg-black opacity-0 hover:opacity-80 rounded-full cursor-pointer"
                   onClick={() => fileInputRef.current.click()}
                 >
                   <span className="text-white text-sm font-medium">Alterar foto</span>
@@ -333,7 +347,7 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
               </div>
             ) : (
               <img
-                src={userData.image}
+                src={userData.profileImage}
                 alt="Foto de perfil"
                 className="w-32 h-32 rounded-full border-4 border-blue-500 object-cover"
               />
@@ -411,7 +425,7 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
 
       {/* Seção de Tags */}
       <div className="flex flex-wrap justify-center gap-2 px-4">
-        {isEditingProfile && isOwnProfile ? (
+        {isEditingProfile && isOwnProfile && !isLoading ? (
           <>
             {tags.map((tag) => (
               <button
