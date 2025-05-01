@@ -126,9 +126,9 @@ const Feed = () => {
         createdAt: response.createdAt,
         updatedAt: response.updatedAt,
         media: {
-          type: response.media.type,
-          url: response.media.url,
-          name: response.media.name
+          type: response.media?.type || '',
+          url: response.media?.url || '',
+          name: response.media?.name || ''
         }
       }
       

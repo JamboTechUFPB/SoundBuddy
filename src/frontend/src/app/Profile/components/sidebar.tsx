@@ -56,12 +56,11 @@ const Sidebar = ({ events, hires, savedItems }) => {
     <>
       {/* Sidebar Principal */}
       <div 
-        className={`bg-black fixed text-white space-y-5 right-0 top-0 bottom-0 w-full md:bg-transparent md:w-96 transition-transform duration-300 z-40 scrollbar-right
-          ${isOpen ? 'translate-x-0' : 'translate-x-full'} lg:translate-x-0
+        className={`bg-black fixed text-white space-y-5 right-0 top-0 bottom-0 ml-auto w-full md:bg-transparent md:w-96 transition-transform duration-300 z-40 scrollbar-right
         `}
       >
         {/* Conteúdo da Sidebar */}
-        <div className="pb-4 pr-4 pl-4 space-y-5 h-full overflow-y-auto">
+        <div className="space-y-5 h-full overflow-y-auto">
           {/* Botão para fechar a sidebar no modo mobile */}
           {isCollapsed && isOpen && (
             <button
@@ -72,7 +71,7 @@ const Sidebar = ({ events, hires, savedItems }) => {
             </button>
           )}
 
-          <div className="pt-6">
+          <div className="pt-6 m-4">
             {/* Seção: Próximos Eventos */}
             <div className="mb-5">
               <div className="flex items-center gap-2 mb-4">
@@ -151,22 +150,7 @@ const Sidebar = ({ events, hires, savedItems }) => {
         </div>
       </div>
 
-      {/* Botão flutuante para abrir a sidebar no modo mobile */}
-      {isCollapsed && (
-        <button
-          onClick={toggleSidebar}
-          className={`
-            fixed z-50 bg-black text-white rounded-full cursor-pointer
-            w-12 h-12 flex items-center justify-center transition-all duration-300
-            ${isOpen ? 'right-64 opacity-0' : 'right-6 opacity-100'}
-            top-6 hover:bg-gray-800 shadow-xl
-          `}
-          aria-label="Toggle Sidebar"
-          
-        >
-          <Bars3Icon className="w-6 h-6" />
-        </button>
-      )}
+      
     </>
   );
 };

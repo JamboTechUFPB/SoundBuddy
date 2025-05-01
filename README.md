@@ -74,7 +74,7 @@ $ docker compose --env-file .env.local up --build
 Expor para a rede
 
 ```bash
-$ docker compose --env-file .env.expose up
+$ docker compose --env-file .env.expose up --build
 ```
 
 Para descobrir o IP do computador

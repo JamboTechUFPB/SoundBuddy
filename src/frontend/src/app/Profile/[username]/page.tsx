@@ -6,6 +6,7 @@ import ProfileMain from '../components/perfil';
 import { userService } from '@/app/services/api';
 import type { ProfileData } from '../components/types';
 import { HomeIcon } from '@heroicons/react/24/solid';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 
 const isProfileDataComplete = (data: ProfileData): boolean => {
   return !!(
@@ -29,6 +30,7 @@ const ProfilePage = () => {
   // SOLUÇÃO PARA TESTE - Toggle manual
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [ownProfileView, setOwnProfileView] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const [profileData, setProfileData] = useState<ProfileData>({
     username: '',
@@ -192,53 +194,69 @@ const ProfilePage = () => {
   };
 
   // seta os dados mockados restantes caso os dados da API ainda estejam []
-  //if (profileData.events.length === 0) {
-  //  setProfileData(prev => ({
-  //    ...prev,
-  //    events: mockData.events,
-  //    hires: mockData.hires,
-  //    savedItems: mockData.savedItems
-  //  }));
-  //}
+  if (profileData.events.length === 0) {
+    setProfileData(prev => ({
+      ...prev,
+      events: mockData.events,
+      hires: mockData.hires,
+      savedItems: mockData.savedItems
+    }));
+  }
 
   // Classe para ajustar o conteúdo principal quando a sidebar está presente
-  const mainClass = ownProfileView ? 
+  const mainClass = isOwnProfile ? 
     'w-full transition-all duration-300 lg:pr-96' : 
     'w-full transition-all duration-300';
 
   return (
     <div className="min-h-screen bg-[#424242] md:bg-[linear-gradient(to_left,_black_10%,_#1a1a1a_20%,_#424242_100%)]">
       
-      <div className='flex flex-row justify-items-start items-center space-x-4 px-4 fixed top-4 left-4 z-50'>
+      <div className='flex flex-row justify-evenly items-center px-4 fixed mt-4 z-50'>
         <button
           onClick={() => router.push('/Home')}
-          className="bg-black hover:bg-gray-700 text-white p-2 rounded-full shadow-lg transition-colors"
+          className="bg-slate-900 hover:bg-gray-800 text-white flex justify-center items-center w-12 h-12 rounded-full shadow-lg transition-colors"
           aria-label="Voltar para a página inicial"
         >
-          <HomeIcon className="w-15 h-15" />
+          <HomeIcon className="w-7 h-7" />
         </button>
 
-        {/* Botão de teste para alternar entre perfil próprio e de outro usuário */}
+        {/* Botão flutuante para abrir a sidebar no modo mobile */}
         {isOwnProfile && (
           <button
-            onClick={() => setOwnProfileView(!ownProfileView)}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md shadow-lg transition-colors"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className={`
+              z-50 bg-slate-900 text-white rounded-full cursor-pointer
+              w-12 h-12 fixed flex items-center justify-center transition-all duration-300
+              ${isSidebarOpen ? 'right-64 opacity-100' : 'right-6 opacity-100'}
+               hover:bg-gray-800 shadow-xl md:hidden
+            `}
+            aria-label="Toggle Sidebar"
           >
-            {ownProfileView ? "Visualizar como outro usuário" : "Visualizar meu perfil"}
+            {isSidebarOpen ? (
+              <XMarkIcon className="w-7 h-7" />
+            ) : (
+              // Ícone de menu hamburguer
+              <Bars3Icon className="w-7 h-7" />
+            )}
           </button>
+        )}
+
+        {/* Sidebar - so exibir se for o próprio perfil */}
+        {isOwnProfile && (
+          <div className={`
+            fixed top-0 right-0 h-full w-64 transform transition-transform duration-300 ease-in-out
+            ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'} md:translate-x-0
+          `}>
+            <Sidebar
+              events={profileData.events}
+              hires={profileData.hires}
+              savedItems={profileData.savedItems}
+            />
+          </div>
         )}
       </div>
       
       <div className="relative">
-        {/* Sidebar - so exibir se for o próprio perfil */}
-        {ownProfileView && (
-          <Sidebar
-            events={profileData.events}
-            hires={profileData.hires}
-            savedItems={profileData.savedItems}
-          />
-        )}
-        
         {/* Conteúdo principal ajustável */}
         <main className={mainClass}>
           <div className="container mx-auto">
