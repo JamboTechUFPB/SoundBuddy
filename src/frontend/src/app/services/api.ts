@@ -1,7 +1,7 @@
 import { IPost, PostData } from "../Home/components/Feed/components/types";
 
-const BASE_URL = 'http://localhost:8000/api';
-const MEDIA_URL = 'http://localhost:8000';
+const BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}/api`;
+const MEDIA_URL = `${process.env.NEXT_PUBLIC_API_URL}`;
 
 const createRequest = (endpoint: string, options: RequestInit = {}): Request => {
   const accessToken = localStorage.getItem('accessToken');
@@ -145,11 +145,27 @@ export const userService = {
 };
 
 export const postService = {
-  getPosts: async (page: number, pageSize: number) => {
+  getPosts: async (page: number, limit: number) => {
     try {
-      const response = await fetch(createRequest(`/posts?page=${page}&pageSize=${pageSize}`));
+      const response = await fetch(createRequest(`/posts?page=${page}&limit=${limit}`));
       if (!response.ok) throw new Error('Falha na requisição');
-      return await response.json();
+      const data = await response.json();
+      // Modifica a URL da imagem para incluir a URL base do backend
+      // para o url da media dos posts e do profileimage
+      data.posts = data.posts.map((post: IPost) => {
+        if (post.media && post.media.url) {
+          post.media.url = `${MEDIA_URL}${post.media.url}`;
+        }
+        if (post.user && post.user.profileImage && !post.user.profileImage.startsWith('http')) {
+          post.user.profileImage = `${MEDIA_URL}${post.user.profileImage}`;
+        }
+        return post;
+      });
+      return {
+        posts: data.posts,
+        totalPages: data.totalPages,
+        currentPage: data.currentPage
+      };
     } catch (error) {
       console.error('Erro ao buscar posts:', error);
       throw error;
@@ -167,17 +183,27 @@ export const postService = {
   },
   createPost: async (formData: FormData) => {
     try {
-      const response = await fetch(createRequest('/posts/create', {
+      const response = await fetch(`${BASE_URL}/posts/create`, {
         method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
         body: formData
-      }));
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Erro ao criar post');
       }
 
-      return await response.json();
+      // append localhost:8000 to response media.url
+      const data = await response.json();
+
+      if (data.media && data.media.url) {
+        data.media.url = `${MEDIA_URL}${data.media.url}`;
+      }
+      return data;
     } catch (error) {
       console.error('Erro ao criar post:', error);
       throw error;

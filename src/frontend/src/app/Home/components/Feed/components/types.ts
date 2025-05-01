@@ -31,7 +31,7 @@ export interface IPost {
 
 export interface PostData {
   content: string;
+  media: File | null;
   mediaType: 'image' | 'video' | 'audio' | null;
-  mediaUrl: string | null;
   mediaName: string | null;
 }

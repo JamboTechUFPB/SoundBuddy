@@ -62,3 +62,27 @@ feat: adiciona integração com banco de dados PostgreSQL
 💻 **Siga este padrão para manter a consistência e colaboração eficaz no projeto!**
 
 ---
+
+## Para rodar a aplicação
+
+Testes normais
+
+```bash
+$ docker compose --env-file .env.local up --build
+```
+
+Expor para a rede
+
+```bash
+$ docker compose --env-file .env.expose up
+```
+
+Para descobrir o IP do computador
+
+```bash
+hostname -I
+# ou
+ip addr show
+# ou
+ifconfig
+```

@@ -10,7 +10,7 @@ const NewPostModal = ({
 }) => {
   const [content, setContent] = useState('');
   const [mediaPreview, setMediaPreview] = useState(null);
-  const [mediaType, setMediaType] = useState(null);
+  const [mediaType, setMediaType] = useState('');
   const [mediaName, setMediaName] = useState(null);
   const [mediaUrl, setMediaUrl] = useState(null);
   const [media, setMedia] = useState(null);
@@ -27,30 +27,25 @@ const NewPostModal = ({
     
     setIsLoading(true);
 
+    const postData = {
+      content,
+      media,
+      mediaType,
+      mediaName
+    }
+
     try {
-      // Para texto simples, apenas envia o conteúdo diretamente
-      if (!media) {
-        await onSubmit(content);
-      } 
-      // Quando há mídia, envia um objeto com os dados
-      else {
-        // SIMULAÇÃO DE UPLOAD DE MÍDIA - TEMOS QUE IMPLEMENTAR O UPLOAD REAL DPS
-        // Em produção, upload para um servidor e receberia uma URL
-        const mediaUrl = URL.createObjectURL(media); // Cria URL temporária para a mídia
-          
-        await onSubmit({
-          content,
-          mediaType: mediaType,
-          mediaUrl: mediaUrl,
-          mediaName: mediaName
-        });
+      if (!currentUser) {
+        alert('Você precisa estar logado para publicar um post.');
+        return;
       }
+      await onSubmit(postData);
       
       // Limpar o formulário
       setContent('');
       setMedia(null);
       setMediaPreview(null);
-      setMediaType(null);
+      setMediaType('');
       setPostData(null);
       
       // Fechar o modal
@@ -123,7 +118,7 @@ const NewPostModal = ({
     setContent('');
     setMedia(null);
     setMediaPreview(null);
-    setMediaType(null);
+    setMediaType('');
     onClose();
   };
 

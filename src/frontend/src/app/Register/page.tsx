@@ -50,7 +50,7 @@ const Register = () => {
       }
 
   
-      const response = await fetch('http://localhost:8000/api/users/create', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/create`, {
         method: 'POST',
         credentials: 'include',
         body: formDataToSend,

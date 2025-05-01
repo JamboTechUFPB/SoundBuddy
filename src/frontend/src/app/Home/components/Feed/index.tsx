@@ -27,6 +27,9 @@ const Feed = () => {
   const [enlargedImage, setEnlargedImage] = useState(null);
   // Estado para controlar a ampliação de vídeos
   const [enlargedVideo, setEnlargedVideo] = useState(null);
+
+  const [feedPageNumber, setFeedPageNumber] = useState(1);
+  const PAGE_SIZE = 10;
   
   const [currentUser, setCurrentUser] = useState({
     profileImage: 'https://i.pravatar.cc/150?img=8',
@@ -77,6 +80,20 @@ const Feed = () => {
   // TODO: Integrar com API de posts/feed
   // Dados mockados de posts - agora incluindo mídia
   const [posts, setPosts] = useState<IPost[]>([]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await postService.getPosts(feedPageNumber, PAGE_SIZE);
+        setPosts(prevPosts => [...prevPosts, ...response.posts]);
+        setFeedPageNumber(response.currentPage);
+      } catch (error) {
+        console.error('Erro ao buscar posts:', error);
+      }
+    };
+
+    fetchPosts();
+  }, [feedPageNumber]);
   
   const mockPosts = [
     {
@@ -89,8 +106,11 @@ const Feed = () => {
       likes: 150,
       createdAt: new Date(),
       updatedAt: new Date(),
-      mediaType: 'image',
-      mediaUrl: 'https://i.pravatar.cc/600?img=1' 
+      media: {
+        type: 'image',
+        url: 'https://i.pravatar.cc/600?img=1',
+        name: 'Setup Atualizado'
+      },
     },
     {
       id: 2,
@@ -135,9 +155,11 @@ const Feed = () => {
       likes: 150,
       createdAt: new Date(),
       updatedAt: new Date(),
-      mediaType: 'audio',
-      mediaUrl: '/sample-audio.mp3',
-      mediaName: 'Nova Composição - Demo.mp3'
+      media: {
+        type: 'audio',
+        url: '/sample-audio.mp3',
+        name: 'Nova Composição - Demo.mp3'
+      }
     },
     {
       id: 6,
@@ -149,8 +171,11 @@ const Feed = () => {
       likes: 150,
       createdAt: new Date(),
       updatedAt: new Date(),
-      mediaType: 'image',
-      mediaUrl: 'https://i.pravatar.cc/600?img=11' // Imagem placeholder
+      media: {
+        type: 'image',
+        url: 'https://i.pravatar.cc/600?img=11', // Imagem placeholder
+        name: 'Vinil Raro'
+      }
     },
     {
       id: 7,
@@ -162,9 +187,11 @@ const Feed = () => {
       likes: 150,
       createdAt: new Date(),
       updatedAt: new Date(),
-      mediaType: 'audio',
-      mediaUrl: '/guitar-solo.mp3',
-      mediaName: 'Guitar Solo - Autoral.mp3'
+      media: {
+        type: 'audio',
+        url: '/guitar-solo.mp3', // URL do áudio
+        name: 'Guitar Solo - Autoral.mp3' // Nome do arquivo de áudio
+      }
     },
     {
       id: 8,
@@ -187,15 +214,20 @@ const Feed = () => {
       likes: 150,
       createdAt: new Date(),
       updatedAt: new Date(),
-      mediaType: 'video',
-      mediaUrl: '/sample-video.mp4'
+      media: {
+        type: 'video',
+        url: '/sample-video.mp4', // URL do vídeo
+        name: 'Skate Trick - Demo.mp4' // Nome do arquivo de vídeo
+      }
     }
   ];
 
   // adicionar posts mockados ao estado inicial
   // se não tiver posts no estado, adicione os mockados
   if (posts.length === 0) {
-    setPosts(mockPosts);
+    
+    //
+    console.log('Adicionando posts mockados ao estado inicial');
   }
 
   /**
@@ -212,7 +244,7 @@ const Feed = () => {
    * Adiciona um novo post ao feed
    * @param {object} postData - Dados do novo post (conteúdo e mídia)
    */
-  const handleNewPost = async () => {
+  const handleNewPost = async (postData: PostData) => {
     try {
       const formDataToSend = new FormData();
       formDataToSend.append('content', postData.content);
@@ -223,12 +255,28 @@ const Feed = () => {
       if (postData.mediaName) {
         formDataToSend.append('mediaName', postData.mediaName);
       }
-      if (postData.mediaUrl) {
-        formDataToSend.append('mediaUrl', postData.mediaUrl);
+      if (postData.media) {
+        formDataToSend.append('media', postData.media);
       }
 
       const response = await postService.createPost(formDataToSend);
-      const newPost = response.post;
+
+      const newPost = {
+        id: response.id,
+        user: {
+          name: currentUser.name,
+          profileImage: currentUser.profileImage
+        },
+        content: postData.content,
+        likes: 0,
+        createdAt: response.createdAt,
+        updatedAt: response.updatedAt,
+        media: {
+          type: response.media.type,
+          url: response.media.url,
+          name: response.media.name
+        }
+      }
       
       setPosts(prevPosts => [newPost, ...prevPosts]);
       setShowModal(false);
@@ -262,19 +310,20 @@ const Feed = () => {
    * Renderiza um componente de mídia baseado no tipo (imagem, vídeo ou áudio)
    * @param {object} post - Post contendo dados de mídia
    */
-  const renderMedia = (post) => {
-    if (!post.mediaType) return null;
+  const renderMedia = (media: Media) => {
+    if (!media) return null;
+    if (!media.type) return null;
 
-    switch (post.mediaType) {
+    switch (media.type) {
       case 'image':
         return (
           <div className="mt-3 mb-10 flex justify-center">
             <div 
               className="relative rounded-lg overflow-hidden cursor-pointer max-w-md"
-              onClick={() => setEnlargedImage(post.mediaUrl)}
+              onClick={() => setEnlargedImage(media.url)}
             >
               <img
-                src={post.mediaUrl}
+                src={media.url}
                 alt="Imagem do post"
                 className="w-full h-auto rounded-lg object-cover"
               />
@@ -287,13 +336,13 @@ const Feed = () => {
           <div className="mt-3 mb-10 flex justify-center">
             <div className="relative rounded-lg overflow-hidden max-w-md">
               <video 
-                src={post.mediaUrl}
+                src={media.url}
                 className="w-full h-full rounded-lg"
                 controls
                 onClick={(e) => {
                   // Previne que o clique no vídeo abra o modal se estiver clicando nos controles
                   if (e.target === e.currentTarget) {
-                    setEnlargedVideo(post.mediaUrl);
+                    setEnlargedVideo(media.url);
                   }
                 }}
               >
@@ -301,7 +350,7 @@ const Feed = () => {
               </video>
               <div 
                 className="absolute cursor-pointer"
-                onClick={() => setEnlargedVideo(post.mediaUrl)}
+                onClick={() => setEnlargedVideo(media.url)}
               ></div>
             </div>
           </div>
@@ -313,13 +362,13 @@ const Feed = () => {
             <div className="flex items-center mb-2">
               <MusicalNoteIcon className="w-5 h-5 text-gray-600 mr-2" />
               <span className="text-sm font-medium text-gray-700">
-                {post.mediaName || "Áudio"}
+                {media.name || "Áudio"}
               </span>
             </div>
             <audio 
               controls 
               className="w-full"
-              src={post.mediaUrl}
+              src={media.url}
             >
               Seu navegador não suporta o elemento de áudio.
             </audio>
@@ -391,7 +440,7 @@ const Feed = () => {
                 <p className="text-gray-600">Likes: {post.likes || 0}</p>
 
                 {/* Renderização da mídia (imagem, vídeo ou áudio) */}
-                {renderMedia(post)}
+                {renderMedia(post.media)}
 
                 {/* Botão para iniciar chat com o autor do post */}
                 <button 

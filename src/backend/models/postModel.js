@@ -88,10 +88,11 @@ postSchema.methods.extractTags = function() {
   this.tags = tags ? tags.map(tag => tag.slice(1).toLowerCase()) : [];
 };
 
-// generates an uuid for the post before saving
-postSchema.pre("save", function(next) {
+// generates an uuid for the post before even creating it
+postSchema.pre("validate", function(next) {
   if (!this.id) {
-    this.id = mongoose.Types.ObjectId().toString();
+    // create new object id (class constructor objectid cannot be invoked without new)
+    this.id = new mongoose.Types.ObjectId().toString();
   }
   next();
 });

@@ -20,8 +20,34 @@ export default function Landing() {
   useEffect(() => {
     // Verifica se existe um token de acesso
     const accessToken = localStorage.getItem('accessToken');
-    
-    // Se o usuário estiver autenticado, redireciona para Home
+
+    // verifica se ainda é válido
+    if (!accessToken) {
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (refreshToken) {
+        fetch('http://localhost:8000/api/refresh', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ token: refreshToken }),
+        })
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            }
+            throw new Error('Falha ao atualizar o token');
+          })
+          .then((data) => {
+            localStorage.setItem('accessToken', data.accessToken);
+            router.push('/Home');
+          })
+          .catch((error) => {
+            console.error('Erro ao atualizar o token:', error);
+          });
+      }
+    }
     if (accessToken) {
       router.push('/Home');
     }

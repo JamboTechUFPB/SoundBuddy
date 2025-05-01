@@ -46,7 +46,8 @@ export const uploadPostMedia = multer({
   },
   fileFilter: (_req, file, cb) => {
     const allowedMimes = ['image/jpeg', 'image/png', 'video/mp4',
-     'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/mp3'];
+     'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/mp3', 'audio/m4a', 'audio/aac',
+     'audio/flac', 'audio/x-flac', 'audio/x-m4a', 'audio/x-aac'];
     if (allowedMimes.includes(file.mimetype)) {
       cb(null, true);
     } else {
