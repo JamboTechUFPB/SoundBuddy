@@ -1,10 +1,11 @@
 "use client";
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Sidebar from '../components/sidebar';
 import ProfileMain from '../components/perfil';
 import { userService } from '@/app/services/api';
 import type { ProfileData } from '../components/types';
+import { HomeIcon } from '@heroicons/react/24/solid';
 
 const isProfileDataComplete = (data: ProfileData): boolean => {
   return !!(
@@ -20,6 +21,7 @@ const isProfileDataComplete = (data: ProfileData): boolean => {
 };
 
 const ProfilePage = () => {
+  const router = useRouter();
   const params = useParams();
   const username = params?.username as string;
   const [windowWidth, setWindowWidth] = useState(0);
@@ -198,6 +200,14 @@ const ProfilePage = () => {
   return (
     <div className="min-h-screen bg-[#424242] md:bg-[linear-gradient(to_left,_black_10%,_#1a1a1a_20%,_#424242_100%)]">
       
+      <button
+        onClick={() => router.push('/Home')}
+        className="fixed top-4 left-4 z-50 bg-black hover:bg-gray-700 text-white p-2 rounded-full shadow-lg transition-colors"
+        aria-label="Voltar para a página inicial"
+      >
+        <HomeIcon className="w-5 h-5" />
+      </button>
+
       {/* Botão de teste para alternar entre perfil próprio e de outro usuário */}
       <button
         onClick={() => setIsOwnProfile(!isOwnProfile)}

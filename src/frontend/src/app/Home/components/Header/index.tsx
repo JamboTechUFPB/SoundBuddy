@@ -131,6 +131,9 @@ const Header = () => {
       <div className="mx-auto h-full px-4">
         {/* Container do conteúdo centralizado com referência para detecção de cliques */}
         <div className="relative flex items-center justify-center h-full" ref={searchRef}>
+          <div className="absolute left-10 top-1/2 transform -translate-y-1/2 hidden md:block">
+            <h1 className="text-2xl font-bold text-white/80">Soundbuddy</h1>
+          </div>
           {/* Container da barra de pesquisa com largura responsiva */}
           <div className="w-full max-w-md md:max-w-lg lg:max-w-xl transition-all duration-300">
             {/* Barra de pesquisa com estilo arredondado e hover */}
