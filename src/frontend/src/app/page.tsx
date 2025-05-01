@@ -72,12 +72,22 @@ export default function Landing() {
 
       <div className="absolute inset-0 bg-zinc-900/10 backdrop-blur-2xl" />
 
+      {/* logo */}
+      <div className="absolute top-16 left-1/2 transform -translate-x-1/2">
+        <img
+          src="/logo.png"
+          alt="SoundBuddy Icon"
+          className="w-32 h-32 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+        />
+      </div>
+
+
       {/* Container do conteúdo - centralizado e com espaçamento vertical */}
       <div className="text-center space-y-6 md:space-y-8 max-w-4xl w-full z-10">
         {/* Seção de título e tagline */}
         <div className="space-y-3 md:space-y-4">
           {/* Título principal da aplicação */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-slate-200">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white tracking-tight drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
             Soundbuddy
           </h1>
           {/* Slogan da aplicação */}
