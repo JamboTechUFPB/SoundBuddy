@@ -45,6 +45,9 @@ const Feed = () => {
   });
 
   const [isLoading, setIsLoading] = useState(true);
+
+  const [posts, setPosts] = useState<IPost[]>([]);
+
   // Hook de roteamento do Next.js
   const router = useRouter();
 
@@ -63,9 +66,10 @@ const Feed = () => {
         setCurrentUser(userInfo);
         
         // Aqui você faria a chamada para buscar os posts
-        // const response = await postService.getPosts();
-        // setPosts(response.posts);
-        
+        const response = await postService.getPosts(feedPageNumber, PAGE_SIZE);
+        setPosts(response.posts);
+        setFeedPageNumber(response.currentPage);
+
       } catch (error) {
         console.error('Erro ao verificar autenticação:', error);
         router.push('/Login');
@@ -76,158 +80,9 @@ const Feed = () => {
 
     checkAuth();
   }, [router]);
-  
-  // TODO: Integrar com API de posts/feed
-  // Dados mockados de posts - agora incluindo mídia
-  const [posts, setPosts] = useState<IPost[]>([]);
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await postService.getPosts(feedPageNumber, PAGE_SIZE);
-        setPosts(prevPosts => [...prevPosts, ...response.posts]);
-        setFeedPageNumber(response.currentPage);
-      } catch (error) {
-        console.error('Erro ao buscar posts:', error);
-      }
-    };
-
-    fetchPosts();
-  }, [feedPageNumber]);
-  
-  const mockPosts = [
-    {
-      id: 1,
-      user: {
-        name: 'tech_enthusiast',
-        profileImage: 'https://i.pravatar.cc/150?img=1',
-      },
-      content: 'Acabei de atualizar meu setup! Novo monitor ultrawide e teclado mecânico 🚀 #setupgoals',
-      likes: 150,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      media: {
-        type: 'image',
-        url: 'https://i.pravatar.cc/600?img=1',
-        name: 'Setup Atualizado'
-      },
-    },
-    {
-      id: 2,
-      user: {
-        name: 'travel_addict',
-        profileImage: 'https://i.pravatar.cc/150?img=2',
-      },
-      content: 'Vista incrível da Praia do Sancho em Fernando de Noronha 🌴 Quem mais ama praias paradisíacas?',
-      likes: 150,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    {
-      id: 3,
-      user: {
-        name: 'foodie_br',
-        profileImage: 'https://i.pravatar.cc/150?img=3',
-      },
-      content: 'Experimentando o novo restaurante de comida japonesa na cidade 🍣 O sashimi estava perfeito!',
-      likes: 150,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    {
-      id: 4,
-      user: {
-        name: 'fitness_freak',
-        profileImage: 'https://i.pravatar.cc/150?img=4',
-      },
-      content: 'Começando o dia com treino pesado 🏋️‍♀️ #foco #disciplina',
-      likes: 150,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    {
-      id: 5,
-      user: {
-        name: 'music_junkie',
-        profileImage: 'https://i.pravatar.cc/150?img=6',
-      },
-      content: 'Minha nova composição! O que acharam? 🎧 #música #composição',
-      likes: 150,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      media: {
-        type: 'audio',
-        url: '/sample-audio.mp3',
-        name: 'Nova Composição - Demo.mp3'
-      }
-    },
-    {
-      id: 6,
-      user: {
-        name: 'vinyl_collector',
-        profileImage: 'https://i.pravatar.cc/150?img=11',
-      },
-      content: 'Acabei de encontrar um vinil raro dos anos 70 🕺 Alguém mais coleciona?',
-      likes: 150,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      media: {
-        type: 'image',
-        url: 'https://i.pravatar.cc/600?img=11', // Imagem placeholder
-        name: 'Vinil Raro'
-      }
-    },
-    {
-      id: 7,
-      user: {
-        name: 'guitar_player',
-        profileImage: 'https://i.pravatar.cc/150?img=12',
-      },
-      content: 'Gravei uma nova música autoral com minha guitarra 🎸 O que acharam do solo?',
-      likes: 150,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      media: {
-        type: 'audio',
-        url: '/guitar-solo.mp3', // URL do áudio
-        name: 'Guitar Solo - Autoral.mp3' // Nome do arquivo de áudio
-      }
-    },
-    {
-      id: 8,
-      user: {
-        name: 'playlist_curator',
-        profileImage: 'https://i.pravatar.cc/150?img=14',
-      },
-      content: 'Criei uma playlist de indie rock para relaxar 🌊 Quem quer o link?',
-      likes: 150,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    {
-      id: 9,
-      user: {
-        name: 'skate_videos',
-        profileImage: 'https://i.pravatar.cc/150?img=15',
-      },
-      content: 'Novo truque que aprendi hoje! 🛹 #skate #manobras',
-      likes: 150,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      media: {
-        type: 'video',
-        url: '/sample-video.mp4', // URL do vídeo
-        name: 'Skate Trick - Demo.mp4' // Nome do arquivo de vídeo
-      }
-    }
-  ];
-
-  // adicionar posts mockados ao estado inicial
-  // se não tiver posts no estado, adicione os mockados
   if (posts.length === 0) {
-    
-    //
-    console.log('Adicionando posts mockados ao estado inicial');
+    console.log('Não há posts.');
   }
 
   /**
@@ -268,7 +123,6 @@ const Feed = () => {
           profileImage: currentUser.profileImage
         },
         content: postData.content,
-        likes: 0,
         createdAt: response.createdAt,
         updatedAt: response.updatedAt,
         media: {
@@ -435,9 +289,6 @@ const Feed = () => {
 
                 {/* Conteúdo do post */}
                 <p className="text-gray-800 pr-8">{post.content}</p>
-
-                {/* Likes do post */}
-                <p className="text-gray-600">Likes: {post.likes || 0}</p>
 
                 {/* Renderização da mídia (imagem, vídeo ou áudio) */}
                 {renderMedia(post.media)}
