@@ -5,15 +5,15 @@ const NewPostModal = ({
   show, 
   onClose, 
   onSubmit, 
-  currentUser = { 
-    avatar: 'https://i.pravatar.cc/150?img=8', 
-    username: '@user' 
-  } 
+  setPostData,
+  currentUser
 }) => {
   const [content, setContent] = useState('');
-  const [media, setMedia] = useState(null);
   const [mediaPreview, setMediaPreview] = useState(null);
   const [mediaType, setMediaType] = useState(null);
+  const [mediaName, setMediaName] = useState(null);
+  const [mediaUrl, setMediaUrl] = useState(null);
+  const [media, setMedia] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   // Refs para os inputs de arquivo
@@ -26,7 +26,7 @@ const NewPostModal = ({
     if (!content.trim() && !media) return;
     
     setIsLoading(true);
-    
+
     try {
       // Para texto simples, apenas envia o conteúdo diretamente
       if (!media) {
@@ -41,8 +41,8 @@ const NewPostModal = ({
         await onSubmit({
           content,
           mediaType: mediaType,
-          mediaUrl,
-          mediaName: media.name
+          mediaUrl: mediaUrl,
+          mediaName: mediaName
         });
       }
       
@@ -51,6 +51,7 @@ const NewPostModal = ({
       setMedia(null);
       setMediaPreview(null);
       setMediaType(null);
+      setPostData(null);
       
       // Fechar o modal
       onClose();
@@ -89,6 +90,8 @@ const NewPostModal = ({
     const reader = new FileReader();
     reader.onload = (e) => {
       setMediaPreview(e.target.result);
+      setMediaName(file.name);
+      setMediaUrl(e.target.result);
     };
     reader.readAsDataURL(file);
   };
@@ -144,7 +147,7 @@ const NewPostModal = ({
             {/* Avatar do usuário */}
             <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
               <img
-                src={currentUser.avatar} 
+                src={currentUser.profileImage || '/default-avatar.png'} 
                 alt="Avatar do usuário" 
                 width={40} 
                 height={40}
@@ -152,7 +155,7 @@ const NewPostModal = ({
               />
             </div>
             {/* Username */}
-            <span className="text-gray-500 text-sm">{currentUser.username}</span>
+            <span className="text-gray-500 text-sm">{currentUser.name}</span>
           </div>
           
           {/* Textarea para o conteúdo do post */}

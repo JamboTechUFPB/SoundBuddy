@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes.js';
+import postRoutes from './routes/postRoutes.js';
 import { userRoutesDefinitions } from './routes/userRoutes.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsDoc from 'swagger-jsdoc';
@@ -37,6 +38,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerJsDoc({
 })));
 
 app.use('/api', userRoutes);
+app.use('/api', postRoutes);
 app.use('/health', healthRoutes);
 
 app.listen(port, () => {

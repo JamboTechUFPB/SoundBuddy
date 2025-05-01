@@ -15,12 +15,20 @@ export default function Login() {
   const router = useRouter();
 
   useEffect(() => {
-    // Verifica se existe um token de acesso
+    // Verifica se existe um token de acesso e sua validade
     const accessToken = localStorage.getItem('accessToken');
+    const tokenExpiration = localStorage.getItem('tokenExpiration');
     
-    // Se o usuário já estiver autenticado, redireciona para Home
-    if (accessToken) {
-      router.push('/Home');
+    if (accessToken && tokenExpiration) {
+      const isTokenValid = Number(tokenExpiration) > Date.now();
+      
+      if (isTokenValid) {
+        router.push('/Home');
+      } else {
+        // Token expirado, remove as informações e mantém na página de login
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('tokenExpiration');
+      }
     }
   }, [router]);
   
@@ -77,6 +85,11 @@ export default function Login() {
     
     try {
       await userService.login(email, password);
+      
+      // Calcula o tempo de expiração (2 horas a partir de agora)
+      const expirationTime = Date.now() + (2 * 60 * 60 * 1000);
+      localStorage.setItem('tokenExpiration', expirationTime.toString());
+      
       router.push('/Home');
     } catch (error) {
       setAuthError('Email ou senha incorretos. Por favor, tente novamente.');

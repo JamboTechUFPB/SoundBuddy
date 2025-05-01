@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { BookmarkIcon, PaperAirplaneIcon, MusicalNoteIcon } from '@heroicons/react/24/outline';
 
 import NewPostModal from './NewPostModal';
 import ChatModal from '@/app/components/ChatModal';
+import { IPost, PostData } from './components/types';
+import { MediaType } from './components/types';
+import { Media } from './components/types';
+import { userService, postService } from '@/app/services/api';
 
 /**
  * Componente Feed
@@ -23,79 +27,176 @@ const Feed = () => {
   const [enlargedImage, setEnlargedImage] = useState(null);
   // Estado para controlar a ampliação de vídeos
   const [enlargedVideo, setEnlargedVideo] = useState(null);
+  
+  const [currentUser, setCurrentUser] = useState({
+    profileImage: 'https://i.pravatar.cc/150?img=8',
+    name: '@user'
+  });
+
+  const [postData, setPostData] = useState({
+    content: '',
+    mediaType: null,
+    mediaUrl: null,
+    mediaName: null,
+    mediaFile: null,
+  });
+
+  const [isLoading, setIsLoading] = useState(true);
   // Hook de roteamento do Next.js
   const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        // Verifica se existe token válido
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+          router.push('/Login');
+          return;
+        }
+
+        // Busca informações básicas do usuário
+        const userInfo = await userService.getBasicInfo();
+        setCurrentUser(userInfo);
+        
+        // Aqui você faria a chamada para buscar os posts
+        // const response = await postService.getPosts();
+        // setPosts(response.posts);
+        
+      } catch (error) {
+        console.error('Erro ao verificar autenticação:', error);
+        router.push('/Login');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, [router]);
   
   // TODO: Integrar com API de posts/feed
   // Dados mockados de posts - agora incluindo mídia
-  const [posts, setPosts] = useState([
+  const [posts, setPosts] = useState<IPost[]>([]);
+  
+  const mockPosts = [
     {
       id: 1,
-      username: 'tech_enthusiast',
-      profileImg: 'https://i.pravatar.cc/150?img=1',
+      user: {
+        name: 'tech_enthusiast',
+        profileImage: 'https://i.pravatar.cc/150?img=1',
+      },
       content: 'Acabei de atualizar meu setup! Novo monitor ultrawide e teclado mecânico 🚀 #setupgoals',
+      likes: 150,
+      createdAt: new Date(),
+      updatedAt: new Date(),
       mediaType: 'image',
       mediaUrl: 'https://i.pravatar.cc/600?img=1' 
     },
     {
       id: 2,
-      username: 'travel_addict',
-      profileImg: 'https://i.pravatar.cc/150?img=2',
-      content: 'Vista incrível da Praia do Sancho em Fernando de Noronha 🌴 Quem mais ama praias paradisíacas?'
+      user: {
+        name: 'travel_addict',
+        profileImage: 'https://i.pravatar.cc/150?img=2',
+      },
+      content: 'Vista incrível da Praia do Sancho em Fernando de Noronha 🌴 Quem mais ama praias paradisíacas?',
+      likes: 150,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
     {
       id: 3,
-      username: 'foodie_br',
-      profileImg: 'https://i.pravatar.cc/150?img=3',
-      content: 'Experimentando o novo restaurante de comida japonesa na cidade 🍣 O sashimi estava perfeito!'
+      user: {
+        name: 'foodie_br',
+        profileImage: 'https://i.pravatar.cc/150?img=3',
+      },
+      content: 'Experimentando o novo restaurante de comida japonesa na cidade 🍣 O sashimi estava perfeito!',
+      likes: 150,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
     {
       id: 4,
-      username: 'fitness_freak',
-      profileImg: 'https://i.pravatar.cc/150?img=4',
-      content: 'Começando o dia com treino pesado 🏋️‍♀️ #foco #disciplina'
+      user: {
+        name: 'fitness_freak',
+        profileImage: 'https://i.pravatar.cc/150?img=4',
+      },
+      content: 'Começando o dia com treino pesado 🏋️‍♀️ #foco #disciplina',
+      likes: 150,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
     {
       id: 5,
-      username: 'music_junkie',
-      profileImg: 'https://i.pravatar.cc/150?img=6',
+      user: {
+        name: 'music_junkie',
+        profileImage: 'https://i.pravatar.cc/150?img=6',
+      },
       content: 'Minha nova composição! O que acharam? 🎧 #música #composição',
+      likes: 150,
+      createdAt: new Date(),
+      updatedAt: new Date(),
       mediaType: 'audio',
       mediaUrl: '/sample-audio.mp3',
-      audioName: 'Nova Composição - Demo.mp3'
+      mediaName: 'Nova Composição - Demo.mp3'
     },
     {
       id: 6,
-      username: 'vinyl_collector',
-      profileImg: 'https://i.pravatar.cc/150?img=11',
+      user: {
+        name: 'vinyl_collector',
+        profileImage: 'https://i.pravatar.cc/150?img=11',
+      },
       content: 'Acabei de encontrar um vinil raro dos anos 70 🕺 Alguém mais coleciona?',
+      likes: 150,
+      createdAt: new Date(),
+      updatedAt: new Date(),
       mediaType: 'image',
       mediaUrl: 'https://i.pravatar.cc/600?img=11' // Imagem placeholder
     },
     {
       id: 7,
-      username: 'guitar_player',
-      profileImg: 'https://i.pravatar.cc/150?img=12',
+      user: {
+        name: 'guitar_player',
+        profileImage: 'https://i.pravatar.cc/150?img=12',
+      },
       content: 'Gravei uma nova música autoral com minha guitarra 🎸 O que acharam do solo?',
+      likes: 150,
+      createdAt: new Date(),
+      updatedAt: new Date(),
       mediaType: 'audio',
       mediaUrl: '/guitar-solo.mp3',
-      audioName: 'Guitar Solo - Autoral.mp3'
+      mediaName: 'Guitar Solo - Autoral.mp3'
     },
     {
       id: 8,
-      username: 'playlist_curator',
-      profileImg: 'https://i.pravatar.cc/150?img=14',
-      content: 'Criei uma playlist de indie rock para relaxar 🌊 Quem quer o link?'
+      user: {
+        name: 'playlist_curator',
+        profileImage: 'https://i.pravatar.cc/150?img=14',
+      },
+      content: 'Criei uma playlist de indie rock para relaxar 🌊 Quem quer o link?',
+      likes: 150,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
     {
       id: 9,
-      username: 'skate_videos',
-      profileImg: 'https://i.pravatar.cc/150?img=15',
+      user: {
+        name: 'skate_videos',
+        profileImage: 'https://i.pravatar.cc/150?img=15',
+      },
       content: 'Novo truque que aprendi hoje! 🛹 #skate #manobras',
+      likes: 150,
+      createdAt: new Date(),
+      updatedAt: new Date(),
       mediaType: 'video',
       mediaUrl: '/sample-video.mp4'
     }
-  ]);
+  ];
+
+  // adicionar posts mockados ao estado inicial
+  // se não tiver posts no estado, adicione os mockados
+  if (posts.length === 0) {
+    setPosts(mockPosts);
+  }
 
   /**
    * Alterna o estado de salvamento de um post
@@ -111,32 +212,30 @@ const Feed = () => {
    * Adiciona um novo post ao feed
    * @param {object} postData - Dados do novo post (conteúdo e mídia)
    */
-  const handleNewPost = (postData) => {
-    // Verifica se postData é uma string (apenas texto) ou um objeto (com mídia)
-    let newPost;
-    
-    if (typeof postData === 'string') {
-      // Caso seja apenas texto
-      newPost = {
-        id: Date.now(), // Gera um ID único baseado no timestamp
-        username: 'current_user', // Deve vir do contexto de autenticação
-        profileImg: 'https://i.pravatar.cc/150?img=5', // Deve vir do perfil do usuário atual
-        content: postData
-      };
-    } else {
-      // Caso inclua mídia
-      newPost = {
-        id: Date.now(),
-        username: 'current_user',
-        profileImg: 'https://i.pravatar.cc/150?img=5',
-        content: postData.content,
-        mediaType: postData.mediaType,
-        mediaUrl: postData.mediaUrl,
-        mediaName: postData.mediaName
-      };
+  const handleNewPost = async () => {
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('content', postData.content);
+
+      if (postData.mediaType) {
+        formDataToSend.append('mediaType', postData.mediaType);
+      }
+      if (postData.mediaName) {
+        formDataToSend.append('mediaName', postData.mediaName);
+      }
+      if (postData.mediaUrl) {
+        formDataToSend.append('mediaUrl', postData.mediaUrl);
+      }
+
+      const response = await postService.createPost(formDataToSend);
+      const newPost = response.post;
+      
+      setPosts(prevPosts => [newPost, ...prevPosts]);
+      setShowModal(false);
+    } catch (error) {
+      console.error('Erro ao criar post:', error);
+      // Implementar tratamento de erro adequado
     }
-    
-    setPosts([newPost, ...posts]); // Adiciona o novo post no topo do feed
   };
 
   /**
@@ -151,8 +250,12 @@ const Feed = () => {
   };
 
   // navegação perfil
-  const handleProfileClick = () => {
-    router.push('/Profile');
+  const handleProfileClick = (username: string) => {
+    router.push(`/Profile/${encodeURIComponent(username)}`);
+    setShowModal(false); // Fecha o modal de novo post
+    setSelectedUser(null); // Fecha o modal de chat se aberto
+    setEnlargedImage(null); // Fecha o modal de imagem ampliada se aberto
+    setEnlargedVideo(null); // Fecha o modal de vídeo ampliado se aberto
   };
 
   /**
@@ -210,7 +313,7 @@ const Feed = () => {
             <div className="flex items-center mb-2">
               <MusicalNoteIcon className="w-5 h-5 text-gray-600 mr-2" />
               <span className="text-sm font-medium text-gray-700">
-                {post.audioName || post.mediaName || "Áudio"}
+                {post.mediaName || "Áudio"}
               </span>
             </div>
             <audio 
@@ -246,6 +349,8 @@ const Feed = () => {
         show={showModal}
         onClose={() => setShowModal(false)}
         onSubmit={handleNewPost}
+        setPostData={setPostData}
+        currentUser={currentUser}
       />
 
       {/* Container principal do feed com posicionamento fixo */}
@@ -262,13 +367,13 @@ const Feed = () => {
                 {/* Cabeçalho do post com avatar e nome de usuário */}
                 <div className="flex items-center mb-4">
                   <img 
-                    src={post.profileImg}
-                    alt={`Perfil de ${post.username}`}
+                    src={post.user.profileImage}
+                    alt={`Perfil de ${post.user.name}`}
                     className="w-10 h-10 rounded-full object-cover mr-3"
                   />
-                  <span onClick={handleProfileClick}  className="font-semibold text-gray-800 cursor-pointer">@{post.username}</span>
+                  <span onClick={() => handleProfileClick(post.user.name)} className="font-semibold text-gray-800 cursor-pointer">@{post.user.name}</span>
                 </div>
-
+ 
                 {/* Botão de salvar post */}
                 <button 
                   onClick={() => toggleSave(post.id)}
@@ -281,6 +386,9 @@ const Feed = () => {
 
                 {/* Conteúdo do post */}
                 <p className="text-gray-800 pr-8">{post.content}</p>
+
+                {/* Likes do post */}
+                <p className="text-gray-600">Likes: {post.likes || 0}</p>
 
                 {/* Renderização da mídia (imagem, vídeo ou áudio) */}
                 {renderMedia(post)}

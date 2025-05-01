@@ -1,15 +1,31 @@
 "use client";
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import Sidebar from './components/sidebar';
-import ProfileMain from './components/perfil';
+import Sidebar from '../components/sidebar';
+import ProfileMain from '../components/perfil';
+import { userService } from '@/app/services/api';
+import type { ProfileData } from '../components/types';
 
 const ProfilePage = () => {
-  const { username } = useParams();
+  const params = useParams();
+  const username = params?.username as string;
   const [windowWidth, setWindowWidth] = useState(0);
   
   // SOLUÇÃO PARA TESTE - Toggle manual
   const [isOwnProfile, setIsOwnProfile] = useState(false);
+
+  const [profileData, setProfileData] = useState<ProfileData>({
+    username: '',
+    image: '',
+    bio: '',
+    followers: 0,
+    following: 0,
+    posts: [],
+    events: [],
+    hires: [],
+    savedItems: []
+  } as ProfileData);
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
     const handleResize = () => {
@@ -23,8 +39,40 @@ const ProfilePage = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        setLoading(true);
+        const data = await userService.getPublicProfile(username as string);
+        setProfileData({
+          username: data.name || username,
+          image: data.profileImage || 'https://i.pravatar.cc/150?img=1',
+          bio: data.about || 'Artista e compositor apaixonado por música.',
+          followers: data.followers || '12345',
+          following: data.following || '6789',
+          posts: data.posts || [],
+          events: data.events || [],
+          hires: data.hires || [],
+          savedItems: data.savedItems || []
+        });
+        
+        // Verificar se é o próprio perfil
+        const basicInfo = await userService.getBasicInfo();
+        setIsOwnProfile(basicInfo.username === username);
+      } catch (error) {
+        console.error('Erro ao carregar perfil:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (username) {
+      loadProfile();
+    }
+  }, [username]);
+
   // Dados mockados - tem que vir de uma API 
-  const profileData = {
+  const mockData = {
     username: username || 'usuário',
     image: 'https://i.pravatar.cc/150?img=8',
     bio: `Músico profissional com 15 anos de experiência em diversos gêneros musicais. 
@@ -110,6 +158,17 @@ const ProfilePage = () => {
       }
     ]
   };
+
+  // seta os dados mockados restantes caso os dados da API ainda estejam []
+  if (profileData.posts.length === 0) {
+    setProfileData(prev => ({
+      ...prev,
+      posts: mockData.posts,
+      events: mockData.events,
+      hires: mockData.hires,
+      savedItems: mockData.savedItems
+    }));
+  }
 
   // Classe para ajustar o conteúdo principal quando a sidebar está presente
   const mainClass = isOwnProfile ? 

@@ -24,13 +24,29 @@ const storage = multer.diskStorage({
   }
 });
 
-export const upload = multer({
+export const uploadProfileImage = multer({
   storage,
   limits: {
     fileSize: 5 * 1024 * 1024 // 5MB
   },
   fileFilter: (_req, file, cb) => {
     const allowedMimes = ['image/jpeg', 'image/png'];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Formato de arquivo inválido'));
+    }
+  }
+});
+
+export const uploadPostMedia = multer({
+  storage,
+  limits: {
+    fileSize: 20 * 1024 * 1024 // 20MB
+  },
+  fileFilter: (_req, file, cb) => {
+    const allowedMimes = ['image/jpeg', 'image/png', 'video/mp4',
+     'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/mp3'];
     if (allowedMimes.includes(file.mimetype)) {
       cb(null, true);
     } else {

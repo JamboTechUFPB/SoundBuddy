@@ -4,6 +4,7 @@ import { generateAccessToken, generateRefreshToken } from "../middlewares/authMi
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
+
 import sharp from 'sharp';
 import path from 'path';
 import fs from 'fs';
@@ -227,7 +228,20 @@ export const userController = {
   async getUserProfileBasicInfo(req, res){
     try {
       const userId = req.user.id? req.user.id : req.user._id;
-      const user = await userModel.findById(userId).select('name email profileImage userType tags');
+      const user = await userModel.findById(userId).select('name email profileImage tags');
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      res.status(200).json(user);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+  async getUserPublicProfileInfo(req, res){
+    try {
+      // get by name
+      const userName = req.params.name;
+      const user = await userModel.findOne({ name: userName }).select('name profileImage about tags');
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }

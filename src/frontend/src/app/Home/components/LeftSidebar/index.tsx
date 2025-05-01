@@ -35,9 +35,9 @@ const LeftSidebar = () => {
   });
   
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchBasicInfo = async () => {
       try {
-        const data = await userService.getProfile();
+        const data = await userService.getBasicInfo();
         setProfileData({
           username: data.name,
           image: data.profileImage,
@@ -51,9 +51,9 @@ const LeftSidebar = () => {
       }
     };
   
-    fetchProfile();
+    fetchBasicInfo();
   }, []);
-  
+
   /**
    * controlar o comportamento responsivo da sidebar
    * - Em telas menores que 1200px, colapsa automaticamente
@@ -88,7 +88,9 @@ const LeftSidebar = () => {
 
   // Navega para a página de perfil do usuário
   const handleProfileClick = () => {
-    router.push('/Profile');
+    router.push(`/Profile/${encodeURIComponent(profileData.username)}`);
+    setIsOpen(false); // Fecha a sidebar ao navegar
+    setModalAtivo({ tipo: null, subtipo: null }); // Fecha qualquer modal aberto
   };
 
   // Função única para abrir modais

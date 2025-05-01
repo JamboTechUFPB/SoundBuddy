@@ -1,3 +1,5 @@
+import { IPost, PostData } from "../Home/components/Feed/components/types";
+
 const BASE_URL = 'http://localhost:8000/api';
 const MEDIA_URL = 'http://localhost:8000';
 
@@ -23,9 +25,28 @@ const createRequest = (endpoint: string, options: RequestInit = {}): Request => 
 };
 
 export const userService = {
-  getProfile: async () => {
+  getPublicProfile: async (username: string) => {
     try {
-      const response = await fetch(createRequest('/users/profile'));
+      const response = await fetch(createRequest(`/users/${username}`));
+      if (!response.ok) throw new Error('Falha ao buscar perfil público');
+      
+      const data = await response.json();
+      
+      // Modifica a URL da imagem para incluir a URL base do backend
+      if (data.profileImage && !data.profileImage.startsWith('http')) {
+        data.profileImage = `${MEDIA_URL}${data.profileImage}`;
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Erro ao buscar perfil público:', error);
+      throw error;
+    }
+  },
+
+  getBasicInfo: async () => {
+    try {
+      const response = await fetch(createRequest('/user'));
       if (!response.ok) throw new Error('Falha na requisição');
       const data = await response.json();
       
@@ -121,4 +142,45 @@ export const userService = {
       throw error;
     }
   },
+};
+
+export const postService = {
+  getPosts: async (page: number, pageSize: number) => {
+    try {
+      const response = await fetch(createRequest(`/posts?page=${page}&pageSize=${pageSize}`));
+      if (!response.ok) throw new Error('Falha na requisição');
+      return await response.json();
+    } catch (error) {
+      console.error('Erro ao buscar posts:', error);
+      throw error;
+    }
+  },
+  getPost: async (postId: string) => {
+    try {
+      const response = await fetch(createRequest(`/posts/${postId}`));
+      if (!response.ok) throw new Error('Falha na requisição');
+      return await response.json();
+    } catch (error) {
+      console.error('Erro ao buscar post:', error);
+      throw error;
+    }
+  },
+  createPost: async (formData: FormData) => {
+    try {
+      const response = await fetch(createRequest('/posts/create', {
+        method: 'POST',
+        body: formData
+      }));
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao criar post');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Erro ao criar post:', error);
+      throw error;
+    }
+  }
 };

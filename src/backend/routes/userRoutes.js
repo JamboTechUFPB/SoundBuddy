@@ -1,16 +1,17 @@
 import express from 'express';
 import { userController } from '../controllers/userController.js';
 import { authenticateToken } from '../middlewares/authMiddleware.js';
-import { upload } from '../middlewares/multerMiddleware.js';
+import { uploadProfileImage } from '../middlewares/multerMiddleware.js';
 
 const router = express.Router();
 
-router.post('/users/create', upload.single('profileImage'), userController.createUser);
+router.post('/users/create', uploadProfileImage.single('profileImage'), userController.createUser);
 router.post('/login', userController.loginUser);
 router.post('/logout', authenticateToken, userController.logoutUser);
 router.get('/refresh-token', authenticateToken, userController.refreshToken);
-router.get('/user', authenticateToken, userController.getUserInfo);
-router.get('/users/profile', authenticateToken, userController.getUserProfileBasicInfo);
+//router.get('/user', authenticateToken, userController.getUserInfo);
+router.get('/user', authenticateToken, userController.getUserProfileBasicInfo);
+router.get('/users/:name', userController.getUserPublicProfileInfo);
 
 export default router;
 
