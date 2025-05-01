@@ -28,6 +28,7 @@ const ProfilePage = () => {
   
   // SOLUÇÃO PARA TESTE - Toggle manual
   const [isOwnProfile, setIsOwnProfile] = useState(false);
+  const [ownProfileView, setOwnProfileView] = useState(true);
 
   const [profileData, setProfileData] = useState<ProfileData>({
     username: '',
@@ -78,7 +79,15 @@ const ProfilePage = () => {
         });
         
         
-        setIsOwnProfile(ownBasicInfo.username === username);
+        // treat username replace special characters encoded by uri
+        const treatedUsername = username.replace(/%20/g, ' ').replace(/%40/g, '@');
+        const isOwnProfile = ownBasicInfo.name === treatedUsername;
+        setIsOwnProfile(isOwnProfile);
+        setProfileData(prev => ({
+          ...prev,
+          username: treatedUsername
+        }));
+        
         console.log('Basic Info:', ownBasicInfo);
         console.log('Profile Data:', data);
         console.log('Is Own Profile:', isOwnProfile);
@@ -193,32 +202,36 @@ const ProfilePage = () => {
   //}
 
   // Classe para ajustar o conteúdo principal quando a sidebar está presente
-  const mainClass = isOwnProfile ? 
+  const mainClass = ownProfileView ? 
     'w-full transition-all duration-300 lg:pr-96' : 
     'w-full transition-all duration-300';
 
   return (
     <div className="min-h-screen bg-[#424242] md:bg-[linear-gradient(to_left,_black_10%,_#1a1a1a_20%,_#424242_100%)]">
       
-      <button
-        onClick={() => router.push('/Home')}
-        className="fixed top-4 left-4 z-50 bg-black hover:bg-gray-700 text-white p-2 rounded-full shadow-lg transition-colors"
-        aria-label="Voltar para a página inicial"
-      >
-        <HomeIcon className="w-5 h-5" />
-      </button>
+      <div className='flex flex-row justify-items-start items-center space-x-4 px-4 fixed top-4 left-4 z-50'>
+        <button
+          onClick={() => router.push('/Home')}
+          className="bg-black hover:bg-gray-700 text-white p-2 rounded-full shadow-lg transition-colors"
+          aria-label="Voltar para a página inicial"
+        >
+          <HomeIcon className="w-15 h-15" />
+        </button>
 
-      {/* Botão de teste para alternar entre perfil próprio e de outro usuário */}
-      <button
-        onClick={() => setIsOwnProfile(!isOwnProfile)}
-        className="fixed top-4 left-4 z-50 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md shadow-lg transition-colors"
-      >
-        {isOwnProfile ? "Visualizar como outro usuário" : "Visualizar meu perfil"}
-      </button>
+        {/* Botão de teste para alternar entre perfil próprio e de outro usuário */}
+        {isOwnProfile && (
+          <button
+            onClick={() => setOwnProfileView(!ownProfileView)}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md shadow-lg transition-colors"
+          >
+            {ownProfileView ? "Visualizar como outro usuário" : "Visualizar meu perfil"}
+          </button>
+        )}
+      </div>
       
       <div className="relative">
         {/* Sidebar - so exibir se for o próprio perfil */}
-        {isOwnProfile && (
+        {ownProfileView && (
           <Sidebar
             events={profileData.events}
             hires={profileData.hires}
