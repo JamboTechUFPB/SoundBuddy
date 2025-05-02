@@ -41,7 +41,40 @@ export const postController = {
       return res.status(500).json({ message: "Internal server error" });
     }
   },
+  async deletePost(req, res) {
+    try {
+      // api/posts/delete/:id
+      const postId = req.params.id;
+      const userId = req.user.id ? req.user.id : req.user._id;
+      console.log("Post ID:", postId);
+      console.log("Post User ID:", req.user);
 
+      // Check if the post exists
+      const post = await PostModel.findOne({ id: postId });
+      console.log("Post found:", post);
+      console.log("User ID:", userId);
+      if (!post) {
+        return res.status(404).json({ message: "Post not found" });
+      }
+
+      console.log("Post user ID:", post.user);
+      console.log("User ID:", userId);
+      console.log("their respective types:", typeof post.user, typeof userId);
+      if (post.user.toString() !== userId.toString()) {
+        console.log("User ID does not match post user ID");
+        return res.status(403).json({ message: "You are not authorized to delete this post" });
+      }
+
+      // Delete the post
+      await PostModel.deleteOne({ id: postId });
+      console.log("Post deleted successfully");
+
+      return res.status(200).json({ message: "Post deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  },
   async getPosts(req, res) {
     try {
       // logica de pageamento e limite

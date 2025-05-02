@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import SeguidoresModal from '@/app/components/SeguidoresModal';
 import { EllipsisHorizontalIcon, TrashIcon, XMarkIcon, MusicalNoteIcon } from '@heroicons/react/24/outline';
-import { userService } from '@/app/services/api';
+import { postService, userService } from '@/app/services/api';
 
 const ProfileMain = ({ userData, isOwnProfile }) => {
   // Lista de tags predefinidas disponíveis para seleção
@@ -289,28 +289,19 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
   };
   
   // Função para excluir post
-  const handleDeletePost = async (postId) => {
+  const handleDeletePost = async (postId: string) => {
     if (!window.confirm('Tem certeza que deseja excluir esta publicação?')) {
       return;
     }
     
     try {
-      // Simular requisição
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Remover post localmente
+      console.log('Excluindo post com ID:', postId);
+      const response = await postService.deletePost(postId);
+      if (!response) {
+        throw new Error('Erro ao excluir post');
+      }
+      // Atualizar posts localmente
       setPosts(posts.filter(post => post.id !== postId));
-      
-      /* 
-      // Implementação real
-      const response = await fetch(`/api/posts/${postId}`, {
-        method: 'DELETE',
-      });
-      
-      if (!response.ok) throw new Error('Falha ao excluir publicação');
-      
-      // Atualizar estado global ou revalidar
-      */
     } catch (error) {
       console.error('Erro ao excluir post:', error);
       // Mostrar notificação de erro
@@ -486,11 +477,11 @@ const ProfileMain = ({ userData, isOwnProfile }) => {
                     className="w-12 h-12 rounded-full object-cover"
                     alt="Autor"
                   />
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-3">
+                  <div className="flex flex-col justify-between w-full">
+                    <div className="flex flex-row items-center justify-between">
+                      <div className="flex flex-col items-start pb-1">
                         <span className="font-semibold text-gray-800">{post.user.name}</span>
-                        <span className="text-gray-400 text-sm">{post.createdAt}</span>
+                        <span className="text-gray-400 text-xs select-none">{post.createdAt}</span>
                       </div>
                       
                       {/* Opções de post para o próprio usuário - Apenas excluir */}

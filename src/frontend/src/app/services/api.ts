@@ -267,5 +267,27 @@ export const postService = {
       console.error('Erro ao criar post:', error);
       throw error;
     }
+  },
+  deletePost: async (postId: string) => {
+    try {
+      const id = postId;
+      const response = await fetch(`${BASE_URL}/posts/delete/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao deletar post');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Erro ao deletar post:', error);
+      throw error;
+    }
   }
 };
