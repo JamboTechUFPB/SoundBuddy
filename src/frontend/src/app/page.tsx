@@ -77,7 +77,7 @@ export default function Landing() {
         <img
           src="/logo.png"
           alt="SoundBuddy Icon"
-          className="w-32 h-32 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+          className="w-64 h-64 object-contain drop-shadow-xl"
         />
       </div>
 

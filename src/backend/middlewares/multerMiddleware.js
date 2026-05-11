@@ -51,7 +51,9 @@ export const uploadPostMedia = multer({
     if (allowedMimes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Formato de arquivo inválido'));
+      cb(null, true);
+      console.log(file.mimetype);
+      //cb(new Error('Formato de arquivo inválido'));
     }
   }
 });

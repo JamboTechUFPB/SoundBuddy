@@ -291,3 +291,28 @@ export const postService = {
     }
   }
 };
+
+export const searchService = {
+  search: async (query: string, page: number = 1) => {
+    try {
+      const response = await fetch(createRequest(`/search?query=${query}&page=${page}`));
+      if (!response.ok) throw new Error('Falha na requisição');
+      return await response.json();
+    } catch (error) {
+      console.error('Erro ao buscar:', error);
+      throw error;
+    }
+  },
+  getPopularTags: async () => {
+    try {
+      const response = await fetch(createRequest('/search/popular-tags'));
+      if (!response.ok) throw new Error('Falha na requisição');
+      const data = await response.json();
+
+      return data;
+    } catch (error) {
+      console.error('Erro ao buscar tags populares:', error);
+      throw error;
+    }
+  }
+}

@@ -294,12 +294,14 @@ const Feed = () => {
                 {renderMedia(post.media)}
 
                 {/* Botão para iniciar chat com o autor do post */}
-                <button 
+                {/*
+                  <button 
                   onClick={() => handleOpenChat(post)}
                   className="absolute bottom-2 right-2 p-2 hover:bg-gray-200 rounded-full transition-colors"
                 >
                   <PaperAirplaneIcon className="w-5 h-5 cursor-pointer text-gray-600 -rotate-45" />
                 </button>
+                */}
               </div>
             ))}
           </div>
