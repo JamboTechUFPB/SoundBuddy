@@ -1,0 +1,8 @@
+node_modules/
+__pycache__/
+site-packages/
+mongo-data/
+
+data/*
+!data/uploads/
+data/uploads/*
