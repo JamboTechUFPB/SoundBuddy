@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'landing-page/**'
+      - 'frontend/demo/**'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -28,10 +29,15 @@ jobs:
         uses: actions/checkout@v4
       - name: Configure Pages
         uses: actions/configure-pages@v5
+      - name: Assemble landing page and app demo
+        run: |
+          mkdir -p _site/app
+          cp -R landing-page/. _site/
+          cp -R frontend/demo/. _site/app/
       - name: Upload static site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: landing-page
+          path: _site
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
