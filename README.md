@@ -9,6 +9,7 @@ A indústria musical é movida por conexões e oportunidades, mas o processo de 
 | [`frontend/`](frontend/) | Aplicação Next.js integrada à API local |
 | [`backend/`](backend/) | API Express e modelos MongoDB |
 | [`landing-page/`](landing-page/) | Apresentação e demonstração interativa estática para GitHub Pages |
+| [`docs/`](docs/) | Relatórios e documentação do projeto |
 
 ## Demonstração pública
 
