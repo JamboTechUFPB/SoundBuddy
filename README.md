@@ -16,9 +16,9 @@ Clique na imagem para abrir a landing page do projeto.
 
 ## Demo da plataforma
 
-A prévia mostra o percurso descobrir → conhecer → conectar dentro da landing page. A demo estática também inclui busca e filtros de músicos, perfis detalhados, publicações, oportunidades, perfis salvos e rascunhos de propostas.
+A prévia percorre rapidamente a plataforma em `/app/`: busca e filtro de músicos, perfil salvo, oportunidades e criação de uma proposta.
 
-![Prévia animada do percurso descobrir, conhecer e conectar no SoundBuddy](landing-page/screenshots/soundbuddy-demo.gif)
+![Demonstração acelerada da plataforma SoundBuddy em /app: busca, perfil, oportunidades e propostas](landing-page/screenshots/soundbuddy-demo.gif)
 
 Os perfis e briefings são fictícios. A demo não envia mensagens, não autentica usuários e não usa a API nem o MongoDB. Perfis salvos e propostas ficam apenas no navegador via `localStorage`.
 
