@@ -40,8 +40,8 @@ Partially implemented / mock-backed:
 
 ## Repository / Study Structure Analysis
 High-level structure:
-- `src/backend`: Express + MongoDB API, models, controllers, routes, upload handling, auth middleware
-- `src/frontend`: Next.js app with landing/login/register/home/profile and componentized UI modules
+- `backend`: Express + MongoDB API, models, controllers, routes, upload handling, auth middleware
+- `frontend`: Next.js app with landing/login/register/home/profile and componentized UI modules
 - `docker-compose.yml`: three-service local orchestration (frontend, backend, MongoDB)
 
 Observations:
@@ -160,18 +160,18 @@ Recoverability is **moderate-to-good**:
 ## Notable Files
 - `README.md` (project mission + workflow guidance)
 - `docker-compose.yml` (local multi-service orchestration)
-- `src/backend/index.js` (backend app entry, middleware, route mounting)
-- `src/backend/controllers/userController.js` (auth/profile lifecycle)
-- `src/backend/controllers/postController.js` (post/media feed behavior)
-- `src/backend/controllers/searchController.js` (search and popular tags)
-- `src/backend/models/userModel.js`, `src/backend/models/postModel.js` (domain schemas)
-- `src/frontend/src/app/services/api.ts` (frontend-backend integration layer)
-- `src/frontend/src/app/Home/components/*` (feed/header/sidebars, mixed implemented + mock features)
-- `src/frontend/src/app/Profile/[username]/page.tsx` (public profile flow with fallback/mock supplementation)
+- `backend/index.js` (backend app entry, middleware, route mounting)
+- `backend/controllers/userController.js` (auth/profile lifecycle)
+- `backend/controllers/postController.js` (post/media feed behavior)
+- `backend/controllers/searchController.js` (search and popular tags)
+- `backend/models/userModel.js`, `backend/models/postModel.js` (domain schemas)
+- `frontend/src/app/services/api.ts` (frontend-backend integration layer)
+- `frontend/src/app/Home/components/*` (feed/header/sidebars, mixed implemented + mock features)
+- `frontend/src/app/Profile/[username]/page.tsx` (public profile flow with fallback/mock supplementation)
 
 ## Datasets / Artifacts
 - No formal research dataset package identified.
-- Media artifacts exist in `src/backend/data/uploads` and appear to function as runtime-generated demo/test assets.
+- Media artifacts exist in `backend/data/uploads` and appear to function as runtime-generated demo/test assets.
 
 ## Important Modules
 - Auth/token middleware and refresh flow
