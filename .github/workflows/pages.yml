@@ -2,7 +2,7 @@ name: Publish SoundBuddy demo
 
 on:
   push:
-    branches: [main]
+    branches: [main, feat/soundbuddy-pages-demo]
     paths:
       - 'landing-page/**'
       - 'frontend/demo/**'
