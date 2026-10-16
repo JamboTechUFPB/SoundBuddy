@@ -46,7 +46,7 @@ function profilePanel(person) {
       <div class="availability"><span class="availability__dot"></span><span>${person.available}</span></div>
       <div class="profile-facts"><div><span>O QUE OFERECE</span><strong>${person.work}</strong><small>${person.detail}</small></div><div><span>EXPERIÊNCIA</span><strong>${person.experience}</strong></div></div>
       <button type="button" class="button button--dark button--wide" data-compose="${person.id}">Escrever proposta <span aria-hidden="true">↗</span></button>
-      <p class="profile-note">Nesta demonstração, a proposta fica salva neste navegador.</p>
+      <p class="profile-note">A proposta fica salva neste navegador.</p>
     </div>
   </aside>`;
 }
@@ -61,7 +61,7 @@ function discoverView() {
 }
 
 function activityView() {
-  return `<div class="content-heading"><div><p class="eyebrow">CONVERSAS QUE COMEÇAM COM MÚSICA</p><h1>O que está acontecendo.</h1><p>Novidades da comunidade incluídas nesta demonstração.</p></div></div><div class="activity-list">${people.map(person => `<article class="activity-card"><div class="activity-card__header">${avatar(person)}<div><button type="button" data-person="${person.id}">${person.name}</button><span>${person.role} · ${person.time}</span></div></div><p>${person.post}</p><div class="activity-card__footer">${tagList(person.tags.slice(0, 2))}<button type="button" data-person="${person.id}">Ver perfil ↗</button></div></article>`).join('')}</div>`;
+  return `<div class="content-heading"><div><p class="eyebrow">CONVERSAS QUE COMEÇAM COM MÚSICA</p><h1>O que está acontecendo.</h1><p>Publicações recentes da comunidade.</p></div></div><div class="activity-list">${people.map(person => `<article class="activity-card"><div class="activity-card__header">${avatar(person)}<div><button type="button" data-person="${person.id}">${person.name}</button><span>${person.role} · ${person.time}</span></div></div><p>${person.post}</p><div class="activity-card__footer">${tagList(person.tags.slice(0, 2))}<button type="button" data-person="${person.id}">Ver perfil ↗</button></div></article>`).join('')}</div>`;
 }
 
 function opportunitiesView() {
@@ -74,20 +74,20 @@ function savedView() {
 }
 
 function draftsView() {
-  return `<div class="content-heading"><div><p class="eyebrow">SEUS RASCUNHOS</p><h1>Propostas.</h1><p>Mensagens criadas nesta demonstração e guardadas neste navegador.</p></div></div><div class="draft-list">${state.drafts.length ? state.drafts.map(draft => `<article class="draft-card"><span class="eyebrow">RASCUNHO SALVO</span><h2>Para ${escapeHtml(draft.to)}</h2><p class="draft-subject">${escapeHtml(draft.subject)}</p><p>${escapeHtml(draft.message)}</p><small>${escapeHtml(draft.date)}</small></article>`).join('') : '<div class="empty-state"><strong>Você ainda não escreveu uma proposta.</strong><p>Escolha um perfil e conte o que gostaria de criar junto.</p><button type="button" class="text-link" data-view="discover">Explorar músicos ↗</button></div>'}</div>`;
+  return `<div class="content-heading"><div><p class="eyebrow">SEUS RASCUNHOS</p><h1>Propostas.</h1><p>Mensagens guardadas neste navegador.</p></div></div><div class="draft-list">${state.drafts.length ? state.drafts.map(draft => `<article class="draft-card"><span class="eyebrow">RASCUNHO SALVO</span><h2>Para ${escapeHtml(draft.to)}</h2><p class="draft-subject">${escapeHtml(draft.subject)}</p><p>${escapeHtml(draft.message)}</p><small>${escapeHtml(draft.date)}</small></article>`).join('') : '<div class="empty-state"><strong>Você ainda não escreveu uma proposta.</strong><p>Escolha um perfil e conte o que gostaria de criar junto.</p><button type="button" class="text-link" data-view="discover">Explorar músicos ↗</button></div>'}</div>`;
 }
 
 function composeModal() {
   if (!state.compose) return '';
   const person = people.find(item => item.id === state.compose);
-  return `<div class="modal-backdrop" data-close-backdrop><section class="modal" role="dialog" aria-modal="true" aria-labelledby="compose-title"><button type="button" class="modal-close" data-close aria-label="Fechar">×</button><p class="eyebrow">COMECE UMA COLABORAÇÃO</p><h2 id="compose-title">Escrever para ${person.name}</h2><p>Um bom primeiro contato inclui o formato, a data e o que você já tem em mente.</p><form id="compose-form"><label>Assunto<input name="subject" maxlength="80" required placeholder="Ex.: Duo acústico para evento em Recife"></label><label>Sua proposta<textarea name="message" minlength="20" maxlength="1000" required rows="6" placeholder="Conte sobre o projeto, o local, a data e a parceria que procura."></textarea></label><button type="submit" class="button button--dark button--wide">Salvar proposta <span aria-hidden="true">↗</span></button></form><small>Esta demonstração não envia mensagens. Seu texto ficará salvo apenas neste navegador.</small></section></div>`;
+  return `<div class="modal-backdrop" data-close-backdrop><section class="modal" role="dialog" aria-modal="true" aria-labelledby="compose-title"><button type="button" class="modal-close" data-close aria-label="Fechar">×</button><p class="eyebrow">COMECE UMA COLABORAÇÃO</p><h2 id="compose-title">Escrever para ${person.name}</h2><p>Um bom primeiro contato inclui o formato, a data e o que você já tem em mente.</p><form id="compose-form"><label>Assunto<input name="subject" maxlength="80" required placeholder="Ex.: Duo acústico para evento em Recife"></label><label>Sua proposta<textarea name="message" minlength="20" maxlength="1000" required rows="6" placeholder="Conte sobre o projeto, o local, a data e a parceria que procura."></textarea></label><button type="submit" class="button button--dark button--wide">Salvar proposta <span aria-hidden="true">↗</span></button></form><small>As propostas não são enviadas. Seu texto fica salvo apenas neste navegador.</small></section></div>`;
 }
 
 function render() {
   const current = people.find(person => person.id === state.selected) || people[0];
   const content = { discover: discoverView, activity: activityView, opportunities: opportunitiesView, saved: savedView, drafts: draftsView }[state.view]();
   app.innerHTML = `<div class="app-shell"><aside class="app-sidebar"><a class="brand" href="../" aria-label="SoundBuddy, início"><span class="brand-mark">♪</span>sound<span>buddy</span><i>.</i></a><p class="sidebar-label">SEU ESPAÇO</p><nav class="app-nav" aria-label="Navegação principal">${[['discover','⌕','Descobrir'],['activity','▦','Comunidade'],['opportunities','✳','Oportunidades'],['saved','♡','Salvos'],['drafts','✉','Propostas']].map(([id,icon,label]) => `<button type="button" data-view="${id}" ${state.view === id ? 'aria-current="page"' : ''}><span aria-hidden="true">${icon}</span>${label}${id === 'saved' && state.saved.length ? `<em>${state.saved.length}</em>` : ''}${id === 'drafts' && state.drafts.length ? `<em>${state.drafts.length}</em>` : ''}</button>`).join('')}</nav><div class="sidebar-bottom"><div class="sidebar-note"><span class="sidebar-note__icon">✳</span><strong>Uma vitrine para novas conexões.</strong><p>Explore perfis, salve referências e esboce uma proposta.</p></div><a href="../">← Voltar à apresentação</a></div></aside>
-  <div class="app-main"><header class="app-topbar"><span>DEMONSTRAÇÃO INTERATIVA</span><span class="app-topbar__right">Dados de exemplo <span class="topbar-dot"></span></span></header><div class="app-columns"><main class="app-content">${content}</main>${profilePanel(current)}</div></div></div>${composeModal()}${state.notice ? `<div class="toast" role="status">${escapeHtml(state.notice)}</div>` : ''}`;
+  <div class="app-main"><header class="app-topbar"><span>SOUNDBUDDY · COMUNIDADE MUSICAL</span><span class="app-topbar__right">Dados de exemplo <span class="topbar-dot"></span></span></header><div class="app-columns"><main class="app-content">${content}</main>${profilePanel(current)}</div></div></div>${composeModal()}${state.notice ? `<div class="toast" role="status">${escapeHtml(state.notice)}</div>` : ''}`;
   if (state.compose) document.querySelector('[name="subject"]')?.focus();
 }
 
