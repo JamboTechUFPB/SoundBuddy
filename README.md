@@ -2,6 +2,28 @@
 
 A indústria musical é movida por conexões e oportunidades, mas o processo de encontrar músicos e contratantes ainda é fragmentado, exigindo buscas extensas e negociações descentralizadas. O **SoundBuddy** surge como uma solução para essa necessidade, funcionando como um **"LinkedIn musical"** que conecta músicos, produtores e contratantes em um ambiente digital dinâmico e interativo.
 
+## Estrutura
+
+| Pasta | Função |
+| --- | --- |
+| [`frontend/`](frontend/) | Aplicação Next.js integrada à API local |
+| [`backend/`](backend/) | API Express e modelos MongoDB |
+| [`landing-page/`](landing-page/) | Apresentação e demonstração interativa estática para GitHub Pages |
+
+## Demonstração pública
+
+A pasta `landing-page/` contém uma experiência autônoma: página de apresentação em `/` e aplicativo demonstrativo em `/app/`. A apresentação inclui uma prévia animada do percurso descobrir → conhecer → conectar. O aplicativo oferece busca e filtros, perfis detalhados, publicações, oportunidades, perfis salvos e rascunhos de propostas. Salvos e rascunhos persistem apenas no navegador via `localStorage`.
+
+Os perfis e briefings são dados editoriais fictícios, criados para retratar situações plausíveis no mercado musical do Nordeste. A demonstração não envia mensagens, não autentica usuários e não utiliza a API ou o MongoDB. A interface deixa essas limitações claras onde afetam uma ação.
+
+Para abrir localmente, sirva a pasta como arquivos estáticos, por exemplo:
+
+```bash
+python3 -m http.server 8080 --directory landing-page
+```
+
+Depois acesse `http://localhost:8080/`. O fluxo [`.github/workflows/pages.yml`](.github/workflows/pages.yml) publica essa pasta no GitHub Pages quando houver um push para `main` ou uma execução manual. No repositório, configure **Settings → Pages → Build and deployment → GitHub Actions**. O endereço esperado, após a primeira publicação, é `https://jambotechufpb.github.io/SoundBuddy/`.
+
 ## 🔄 Fluxo de Trabalho
 
 Para garantir consistência no desenvolvimento:

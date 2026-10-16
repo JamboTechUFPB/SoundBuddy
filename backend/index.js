@@ -39,7 +39,7 @@ app.get('/', (req, res) => {
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerJsDoc({
   definition: userRoutesDefinitions,
-  apis: ['./src/backend/routes/*.js'],
+  apis: ['./routes/*.js'],
 })));
 
 app.use('/api', userRoutes);
